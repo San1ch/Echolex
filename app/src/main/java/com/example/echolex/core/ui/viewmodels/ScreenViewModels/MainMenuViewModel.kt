@@ -1,0 +1,118 @@
+package com.example.echolex.core.ui.viewmodels.ScreenViewModels
+
+import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import co.yml.charts.common.model.PlotType
+import co.yml.charts.ui.piechart.models.PieChartConfig
+import co.yml.charts.ui.piechart.models.PieChartData
+import com.example.echolex.core.domain.service.centralScreenService.NavigationCenter
+import com.example.echolex.core.domain.useCase.screensUseCases.AllCardsStats
+import com.example.echolex.core.domain.useCase.screensUseCases.GetAllCardsStatUseCase
+import com.example.echolex.core.navigation.NavigationTarget.DeckScreens
+import com.example.echolex.core.navigation.NavigationTarget.LessonScreens
+import com.example.echolex.core.navigation.NavigationTarget.LessonSettingsScreens
+import com.example.echolex.ui.theme.AppCardItemLearnedStatusColor
+import com.example.echolex.ui.theme.AppCardItemNotLearnedStatusColor
+import com.example.echolex.ui.theme.AppCardItemPreLearnedStatusColor
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class MainMenuViewModel @Inject constructor(
+    private val getAllCardsStatUseCase: GetAllCardsStatUseCase,
+    private val navigationCenter: NavigationCenter
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<MainMenuUiState>(MainMenuUiState.Loading)
+    val uiState: StateFlow<MainMenuUiState> = _uiState.asStateFlow()
+
+    private val _donutChartData = MutableStateFlow<PieChartData?>(null)
+    val donutChartData: StateFlow<PieChartData?> = _donutChartData.asStateFlow()
+
+    val donutChartConfig = PieChartConfig(
+        isAnimationEnable = false,
+        backgroundColor = Color.Transparent
+    )
+
+    init {
+        loadInitialData()
+    }
+
+    fun loadInitialData() {
+        viewModelScope.launch {
+            _uiState.value = MainMenuUiState.Loading
+
+            val result = getAllCardsStatUseCase()
+
+            if (result.isSuccess) {
+                val stats = result.getOrNull()
+                if (stats != null) {
+                    updateChartData(stats)
+                    _uiState.value = MainMenuUiState.Success(
+                        stats = stats
+                    )
+                } else {
+                    _uiState.value = MainMenuUiState.Error("Data is null")
+                }
+            } else {
+                val errorMessage = result.exceptionOrNull()?.message ?: "Unknown error"
+                _uiState.value = MainMenuUiState.Error(errorMessage)
+            }
+
+        }
+    }
+
+    private fun updateChartData(stats: AllCardsStats) {
+        _donutChartData.value = PieChartData(
+            slices = listOf(
+                PieChartData.Slice(
+                    "Learned",
+                    stats.countOfLearnedCards,
+                    AppCardItemLearnedStatusColor
+                ),
+                PieChartData.Slice(
+                    "In process",
+                    stats.countOfPreLearnedCards,
+                    AppCardItemPreLearnedStatusColor
+                ),
+                PieChartData.Slice(
+                    "Not learned",
+                    stats.countOfNotLearnedCards,
+                    AppCardItemNotLearnedStatusColor
+                )
+            ),
+            plotType = PlotType.Donut
+        )
+    }
+
+    fun openDecksMenu() {
+        navigationCenter.navigate(DeckScreens.DecksMenu)
+    }
+
+    fun openLessonSettingsMenu() {
+        navigationCenter.navigate(LessonSettingsScreens.LessonSettings)
+    }
+
+    fun openLessonMenu() {
+        navigationCenter.navigate(LessonScreens.Lesson)
+    }
+
+    fun onRetry() {
+        loadInitialData()
+    }
+
+}
+
+sealed class MainMenuUiState {
+    object Loading : MainMenuUiState()
+    data class Success(
+        val stats: AllCardsStats
+    ) : MainMenuUiState()
+
+    data class Error(val message: String) : MainMenuUiState()
+}

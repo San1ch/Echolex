@@ -1,0 +1,25 @@
+package com.example.echolex.core.domain.service.centralScreenService
+
+import com.example.echolex.core.data.model.AppNotification
+import com.example.echolex.core.navigation.NavigationTarget
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class NavigationCenter @Inject constructor() {
+    private val _navigationStatus = MutableStateFlow<AppNotification>(AppNotification.Null)
+    val notificationStatus: StateFlow<AppNotification> = _navigationStatus
+
+    private val _navTarget = MutableStateFlow<NavigationTarget>(NavigationTarget.NullScreen)
+    val navTarget: StateFlow<NavigationTarget> = _navTarget
+
+    fun navigate(target: NavigationTarget) {
+        _navTarget.value = target
+    }
+
+    fun resetTarget() {
+        _navTarget.value = NavigationTarget.NullScreen
+    }
+}

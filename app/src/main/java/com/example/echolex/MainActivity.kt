@@ -1,37 +1,102 @@
 package com.example.echolex
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.echolex.ui.theme.EcholexTheme
+import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.echolex.core.data.model.AppNotification
+import com.example.echolex.core.navigation.NavigationTarget
+import com.example.echolex.core.ui.viewmodels.CenterProgramViewModel
+import com.example.echolex.ui.customDesign.NotificationWindow
+import com.example.echolex.ui.screens.DeckImportScreenRoute
+import com.example.echolex.ui.screens.DeckItemScreenRoute
+import com.example.echolex.ui.screens.DecksMenuScreenRoute
+import com.example.echolex.ui.screens.LessonMenuScreenRoute
+import com.example.echolex.ui.screens.LessonSettingsMenuScreenRoute
+import com.example.echolex.ui.screens.MainScreen.DeckMenuScreen.DeckImportScreen.DeckImportScreen
+import com.example.echolex.ui.screens.MainScreen.DeckMenuScreen.DeckItemScreen.DeckItemScreen
+import com.example.echolex.ui.screens.MainScreen.DeckMenuScreen.DecksScreen
+import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.LessonScreen
+import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.LessonSettingsScreen
+import com.example.echolex.ui.screens.MainScreen.MainScreen
+import com.example.echolex.ui.screens.MainScreenRoute
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        transperentHotbar()
         setContent {
-            ProgramScreen()
+            CenterProgramScreen()
         }
     }
+
+    fun transperentHotbar() {
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
+    }
+
+
 }
 
 @Composable
-fun ProgramScreen() {
+fun CenterProgramScreen(viewModel: CenterProgramViewModel = hiltViewModel()) {
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = MainScreenRoute,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+        composable(MainScreenRoute) { MainScreen() }
+        composable(DecksMenuScreenRoute) { DecksScreen() }
+        composable(DeckItemScreenRoute) { DeckItemScreen() }
+        composable(DeckImportScreenRoute) { DeckImportScreen() }
+        composable(LessonMenuScreenRoute) { LessonScreen() }
+        composable(LessonSettingsMenuScreenRoute) { LessonSettingsScreen() }
+    }
 
+    CenterProgramNotification(viewModel)
+    CenterProgramNavigation(viewModel, navController)
 }
 
-@Preview(showBackground = true)
 @Composable
-fun ProgramScreenPreview() {
-    EcholexTheme {
-        ProgramScreen()
+private fun CenterProgramNotification(viewModel: CenterProgramViewModel) {
+    val notificationState = viewModel.notificationState.collectAsState()
+
+    if (notificationState.value !is AppNotification.Null) {
+        val notification = notificationState.value
+        NotificationWindow(notification.title, notification.message, {
+            viewModel.closeNotification()
+        })
     }
 }
+
+@Composable
+fun CenterProgramNavigation(viewModel: CenterProgramViewModel, navController: NavController) {
+    val navigationTarget = viewModel.navigationTarget.collectAsState()
+
+    if (navigationTarget.value !is NavigationTarget.NullScreen) {
+        navController.navigate(navigationTarget.value.route)
+        viewModel.resetNavigationTarget()
+    }
+}
+
