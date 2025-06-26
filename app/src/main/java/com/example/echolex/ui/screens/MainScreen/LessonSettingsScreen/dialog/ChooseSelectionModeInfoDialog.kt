@@ -1,0 +1,63 @@
+package com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.echolex.R
+import com.example.echolex.core.domain.data.model.lesson.CardSelectionMode
+import com.example.echolex.core.domain.data.model.lesson.RepeatingStage
+import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuViewModel
+import com.example.echolex.ui.customDesign.AppStandardDialogBackground
+import com.example.echolex.ui.theme.AppContentColor
+import com.example.echolex.ui.theme.nunitoVariableFont
+
+@Composable
+fun ChooseSelectionModeInfoDialog(viewModel: LessonMenuViewModel) {
+    AppStandardDialogBackground(onOverlayClick = {
+        viewModel.dialogCenter.openCurrentCreatingStageDialog()
+    }) {
+        val currentStage = viewModel.uiState.value.currentCreatingStage as RepeatingStage
+        val currentMode = currentStage.cardSelectionMode
+        val text = when (currentMode) {
+            CardSelectionMode.RANDOM -> {
+                stringResource(R.string.random_mode_info)
+            }
+
+            CardSelectionMode.PREFER_LOW_PRIORITY -> {
+                stringResource(R.string.prefer_low_priority_mode_info)
+            }
+
+            CardSelectionMode.PREFER_HIGH_PRIORITY -> {
+                stringResource(R.string.prefer_high_priority_mode_info)
+            }
+
+            CardSelectionMode.LOCK_TO_PRIORITY -> {
+                stringResource(R.string.lock_to_priority_mode_info)
+            }
+        }
+        ChooseSelectionModeInfoDialogContent(viewModel, text)
+    }
+}
+
+@Composable
+private fun ChooseSelectionModeInfoDialogContent(viewModel: LessonMenuViewModel, text: String) {
+    Box(modifier = Modifier
+    .fillMaxWidth().wrapContentHeight().padding(30.dp), contentAlignment = Alignment.Center) {
+        Text(
+            text, style = TextStyle(
+                fontSize = 20.sp,
+                fontFamily = nunitoVariableFont,
+                color = AppContentColor
+            )
+        )
+    }
+}

@@ -13,27 +13,28 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.echolex.R
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels.DeckImportViewModel
-import com.example.echolex.ui.customDesign.AppBorderButton
+import com.example.echolex.ui.customDesign.AppAltLabel
 import com.example.echolex.ui.customDesign.AppButton
 import com.example.echolex.ui.customDesign.AppMultiLineOutlinedTextField
 import com.example.echolex.ui.customDesign.AppOutlinedTextField
+import com.example.echolex.ui.customDesign.LabeledCheckbox
 import com.example.echolex.ui.customDesign.StandardStart
 import com.example.echolex.ui.theme.AppButtonBackgroundColor
 import com.example.echolex.ui.theme.AppButtonContentColor
-import com.example.echolex.ui.theme.AppContentAltColor
-import com.example.echolex.ui.theme.AppContentColor
-import com.example.echolex.ui.theme.fugazOneFontFamily
+import com.example.echolex.ui.theme.nunitoVariableFont
 
 @Composable
 fun DeckImportScreen (viewModel: DeckImportViewModel = hiltViewModel()){
@@ -57,13 +58,14 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
             ) {
                 Spacer(
                     modifier = Modifier
-                        .height(65.dp)
+                        .height(80.dp)
                 )
                 Text(
-                    text = "IMPORT DECK",
+                    text = stringResource(R.string.import_deck),
                     style = TextStyle(
                         fontSize = 25.sp,
-                        fontFamily = fugazOneFontFamily,
+                        fontFamily = nunitoVariableFont,
+                        fontWeight = FontWeight.Black,
                         color = AppButtonContentColor
                     ),
                     modifier = Modifier.padding(bottom = 30.dp)
@@ -71,7 +73,7 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
 
                 Spacer(
                     modifier = Modifier
-                        .height(130.dp)
+                        .height(100.dp)
                 )
 
                 Column(
@@ -84,19 +86,14 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         // Deck Name Label
-                        Text(
-                            text = "Deck name",
-                            style = TextStyle(
-                                fontSize = 15.sp,
-                                fontFamily = fugazOneFontFamily,
-                                color = AppContentAltColor
-                            ),
-                            modifier = Modifier.padding(start = 20.dp)
+
+                        AppAltLabel(
+                            text = stringResource(R.string.deck_name),
                         )
 
                         // Deck Name Input
                         AppOutlinedTextField(
-                            value = viewModel.nameTextField.value,
+                            value = viewModel.uiState.value.nameText,
                             onValueChange = viewModel::onNameTextChanged,
                             backgroundColor = AppButtonBackgroundColor,
                             borderColor = AppButtonBackgroundColor,
@@ -107,25 +104,15 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
                                 .height(10.dp)
                         )
                         // Import Input Label
-                        Text(
-                            text = "Import input",
-                            style = TextStyle(
-                                fontSize = 15.sp,
-                                fontFamily = fugazOneFontFamily,
-                                color = AppContentAltColor
-                            ),
-                            modifier = Modifier.padding(start = 20.dp)
+                        AppAltLabel(
+                            text = stringResource(R.string.import_input),
                         )
 
                         // Import Multi-line Input
                         AppMultiLineOutlinedTextField(
-                            value = viewModel.importTextField.value,
-                            onValueChange = viewModel::onImportTextChanged, // Тобі треба окремий метод для цього поля
-                            placeholderText = """
-                        Format:
-                        word, translate;
-                        word, translate;
-                    """.trimIndent(),
+                            value = viewModel.uiState.value.importText,
+                            onValueChange = viewModel::onImportTextChanged,
+                            placeholderText = stringResource(R.string.import_format).trimIndent(),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(100.dp),
@@ -138,21 +125,23 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             AppButton(
-                                text = "PASTE",
+                                text = stringResource(R.string.paste),
                                 onClick = {
                                     val clipData = clipboardManager.primaryClip
                                     val item = clipData?.getItemAt(0)
                                     val pasteText = item?.text?.toString() ?: ""
                                     viewModel.pasteImportText(pasteText)
                                 },
-                                modifier = Modifier.width(150.dp)
+                                modifier = Modifier.width(150.dp),
+                                cornerRadius = 7
                             )
                             AppButton(
-                                text = "CLEAR",
+                                text = stringResource(R.string.clear),
                                 onClick = {
                                     viewModel.clearImportText()
                                 },
-                                modifier = Modifier.width(150.dp)
+                                modifier = Modifier.width(150.dp),
+                                cornerRadius = 7
                             )
                         }
                         Spacer(
@@ -163,25 +152,16 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
                             modifier = Modifier.wrapContentSize(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Spacer(modifier = Modifier.width(16.dp))
+                            LabeledCheckbox(
+                                checked = viewModel.uiState.value.markAsPreLearned,
+                                onCheckedChange = { viewModel.toggleMarkAsPreLearned() },
+                                text = stringResource(R.string.mark_pre_learned),
 
-                            Checkbox(
-                                checked = viewModel.isMarkingLikePreLearned.value,
-                                onCheckedChange = { viewModel.toggleMarkAsPreLearned() }
-                            )
-                            Spacer(modifier = Modifier.width(5.dp))
-
-                            Text(
-                                "Mark as pre-learned", style = TextStyle(
-                                    fontSize = 15.sp,
-                                    fontFamily = fugazOneFontFamily,
-                                    color = AppContentColor
-                                )
                             )
                         }
                     }
-                    AppBorderButton(
-                        text = "CREATE DECK",
+                    AppButton(
+                        text = stringResource(R.string.create_deck),
                         modifier = Modifier,
                         onClick = {
                             viewModel.startCreatingDeck()
@@ -194,3 +174,4 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
         }
     }
 }
+

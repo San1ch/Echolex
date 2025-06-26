@@ -35,12 +35,12 @@ val Typography = Typography(
     */
 )
 
-val fugazOneFontFamily = FontFamily(
-    Font(R.font.fugaz_one_regular, FontWeight.Normal)
-)
-val underdogFontFamily = FontFamily(
-    Font(R.font.underdog_regular, FontWeight.Normal)
-)
-val calSansFontFamily = FontFamily(
-    Font(R.font.cal_sans_regular, FontWeight.Normal)
+
+val nunitoVariableFont = FontFamily(
+    Font(R.font.nunito_extra_light, FontWeight.W100),
+    Font(R.font.nunito_light, FontWeight.W300),
+    Font(R.font.nunito_regular, FontWeight.Normal),
+    Font(R.font.nunito_medium, FontWeight.Medium),
+    Font(R.font.nunito_bold, FontWeight.Bold),
+    Font(R.font.nunito_black, FontWeight.Black)
 )

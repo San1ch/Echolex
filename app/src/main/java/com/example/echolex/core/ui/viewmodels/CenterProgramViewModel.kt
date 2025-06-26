@@ -1,8 +1,7 @@
 package com.example.echolex.core.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.example.echolex.core.data.model.AppNotification
-import com.example.echolex.core.navigation.NavigationTarget
+import com.example.echolex.core.domain.data.model.notification.AppNotification
 import com.example.echolex.core.domain.service.centralScreenService.NavigationCenter
 import com.example.echolex.core.domain.service.centralScreenService.NotificationCenter
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,21 +14,22 @@ class CenterProgramViewModel @Inject constructor(
 ) : ViewModel() {
     val notificationState = notificationCenter.notificationState
     val navigationTarget = navigationCenter.navTarget
+    val shouldNavigateBack = navigationCenter.shouldNavigateBack
 
     fun closeNotification() {
         notificationCenter.closeNotification()
     }
 
-    fun setNotification(notification: AppNotification) {
-        notificationCenter.setNotification(notification)
-    }
-
-    fun setNavigationTarget(target: NavigationTarget) {
-        navigationCenter.navigate(target)
+    fun resetNotification() {
+        notificationCenter.setNotification(AppNotification.Null)
     }
 
     fun resetNavigationTarget() {
         navigationCenter.resetTarget()
+    }
+
+    fun resetBackMode() {
+        navigationCenter.resetBackMode()
     }
 
 }

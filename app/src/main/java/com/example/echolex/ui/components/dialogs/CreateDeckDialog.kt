@@ -11,6 +11,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.echolex.R
 
 @Composable
 fun CreateDeckDialog(
@@ -22,12 +24,12 @@ fun CreateDeckDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Create new deck") },
+        title = { Text(stringResource(R.string.create_new_deck)) },
         text = {
             OutlinedTextField(
                 value = deckName,
                 onValueChange = { deckName = it },
-                label = { Text("Deck name") }
+                label = { Text(stringResource(R.string.deck_name)) }
             )
         },
         confirmButton = {
@@ -38,12 +40,12 @@ fun CreateDeckDialog(
                 },
                 enabled = deckName.isNotBlank()
             ) {
-                Text("Create")
+                Text(stringResource(R.string.create))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         },
         modifier = modifier

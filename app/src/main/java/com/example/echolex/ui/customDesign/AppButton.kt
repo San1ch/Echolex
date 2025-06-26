@@ -18,22 +18,22 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Text
 import com.example.echolex.ui.theme.AppButtonBackgroundColor
 import com.example.echolex.ui.theme.AppButtonContentColor
-import com.example.echolex.ui.theme.calSansFontFamily
-import com.example.echolex.ui.theme.fugazOneFontFamily
+import com.example.echolex.ui.theme.nunitoVariableFont
 
 
 @Composable
 fun AppButton(
     text: String,
-    onClick: () -> Unit,
     backgroundColor: Color = AppButtonBackgroundColor,
-    modifier: Modifier
+    modifier: Modifier,
+    cornerRadius: Int = 15,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
-            .clip(RoundedCornerShape(11.dp))
+            .clip(RoundedCornerShape(cornerRadius.dp))
             .background(backgroundColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
@@ -42,8 +42,8 @@ fun AppButton(
             text = text,
             style = TextStyle(
                 fontSize = 25.sp,
-                fontWeight = FontWeight.Normal,
-                fontFamily = calSansFontFamily,
+                fontFamily = nunitoVariableFont,
+                fontWeight = FontWeight.Black,
                 color = AppButtonContentColor
             )
         )

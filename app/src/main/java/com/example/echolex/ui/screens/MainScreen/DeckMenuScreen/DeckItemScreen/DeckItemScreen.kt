@@ -1,5 +1,8 @@
 package com.example.echolex.ui.screens.MainScreen.DeckMenuScreen.DeckItemScreen
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -40,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.echolex.core.constants.COUNT_OF_REPETITION_TO_LEARN
-import com.example.echolex.core.data.model.dataclass.Card
+import com.example.echolex.core.domain.data.model.deck.Card
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels.DeckItemViewModel
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels.DeckItemViewModel.DeckItemDialogMode
 import com.example.echolex.ui.customDesign.AppBorderButton
@@ -57,8 +60,12 @@ import com.example.echolex.ui.theme.AppCardItemNotLearnedStatusColor
 import com.example.echolex.ui.theme.AppCardItemPreLearnedStatusColor
 import com.example.echolex.ui.theme.AppContentAltColor
 import com.example.echolex.ui.theme.AppContentColor
-import com.example.echolex.ui.theme.fugazOneFontFamily
+import com.example.echolex.ui.theme.nunitoVariableFont
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.echolex.R
+import com.example.echolex.ui.customDesign.AppButton
 
 
 @Composable
@@ -70,6 +77,11 @@ fun DeckItemScreen(viewModel: DeckItemViewModel = hiltViewModel()) {
 fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
     val localDeck by viewModel.localDeck
     val centralDeck by viewModel.screenDeck.collectAsState()
+
+    val context = LocalContext.current
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+
     StandardStart {
         Spacer(
             modifier = Modifier
@@ -82,7 +94,7 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
-                contentDescription = "Deck deleter",
+                contentDescription = stringResource(R.string.remove_deck),
                 tint = AppContentAltColor,
                 modifier = Modifier
                     .clickable() {
@@ -92,7 +104,7 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
             Text(
                 text = centralDeck.name,
                 fontSize = 15.sp,
-                fontFamily = fugazOneFontFamily,
+                fontFamily = nunitoVariableFont,
                 color = AppContentColor,
                 modifier = Modifier.clickable() {
                     viewModel.openChangeNameDialog()
@@ -101,7 +113,7 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
             Text(
                 localDeck.cards.size.toString(), style = TextStyle(
                     fontSize = 20.sp,
-                    fontFamily = fugazOneFontFamily,
+                    fontFamily = nunitoVariableFont,
                     color = AppContentAltColor
                 )
             )
@@ -119,9 +131,9 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            "Deck is empty", style = TextStyle(
+                            stringResource(R.string.deck_is_empty), style = TextStyle(
                                 fontSize = 20.sp,
-                                fontFamily = fugazOneFontFamily,
+                                fontFamily = nunitoVariableFont,
                                 color = AppCardItemContentColor
                             )
                         )
@@ -163,8 +175,8 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        AppBorderButton(
-                            text = "IMPORT",
+                        AppButton(
+                            text = stringResource(R.string.Import),
                             onClick = {
                                 viewModel.openImportDialog()
                             },
@@ -174,20 +186,26 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
                             modifier = Modifier
                                 .width(5.dp)
                         )
-                        AppBorderButton(
-                            text = "EXPORT",
-                            onClick = { },
+                        AppButton(
+                            text = stringResource(R.string.export),
+                            onClick = {
+                                viewModel.exportDeck { exportedText ->
+                                    val clip = ClipData.newPlainText(context.getString(R.string.exported_deck), exportedText)
+                                    clipboard.setPrimaryClip(clip)
+                                }
+                            },
                             modifier = Modifier.weight(1f)
                         )
+
                     }
                     Spacer(
                         modifier = Modifier
                             .height(20.dp)
                     )
-                    AppBorderButton(
-                        text = "Back",
+                    AppButton(
+                        text = stringResource(R.string.back),
                         onClick = {
-                            viewModel.navigateDeckMenu()
+                            viewModel.backScreen()
                         },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -196,19 +214,19 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
 
         }
     }
-    DeckItemDialogs(viewModel)
+    Dialogs(viewModel)
 }
 
 @Composable
-private fun DeckItemDialogs(viewModel: DeckItemViewModel) {
-    DeckItemDialogRemoveDeck(viewModel)
-    DeckItemDialogChangeName(viewModel)
-    DeckItemDialogImport(viewModel)
-    DeckItemDialogRemoveCard(viewModel)
+private fun Dialogs(viewModel: DeckItemViewModel) {
+    DialogRemoveDeck(viewModel)
+    DialogChangeName(viewModel)
+    DialogImport(viewModel)
+    DialogRemoveCard(viewModel)
 }
 
 @Composable
-private fun DeckItemDialogRemoveDeck(viewModel: DeckItemViewModel) {
+private fun DialogRemoveDeck(viewModel: DeckItemViewModel) {
     AnimatedVisibility(
         visible = viewModel.dialogMode.value is DeckItemDialogMode.RemoveDeck,
         enter = fadeIn(animationSpec = tween<Float>(durationMillis = 300)),
@@ -243,9 +261,9 @@ private fun DeckItemDialogRemoveDeck(viewModel: DeckItemViewModel) {
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "Remove deck?", style = TextStyle(
+                        stringResource(R.string.remove_deck), style = TextStyle(
                             fontSize = 30.sp,
-                            fontFamily = fugazOneFontFamily,
+                            fontFamily = nunitoVariableFont,
                             color = AppCardItemContentColor
                         )
                     )
@@ -257,11 +275,11 @@ private fun DeckItemDialogRemoveDeck(viewModel: DeckItemViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        AppBorderButton("YES", {
+                        AppBorderButton(stringResource(R.string.yes), {
                             viewModel.deleteDeck()
                         }, modifier = Modifier.width(150.dp))
                         Spacer(modifier = Modifier.width(15.dp))
-                        AppBorderButton("NO", {
+                        AppBorderButton(stringResource(R.string.no), {
                             viewModel.cancelDeleting()
                         }, modifier = Modifier.width(150.dp))
                     }
@@ -272,7 +290,7 @@ private fun DeckItemDialogRemoveDeck(viewModel: DeckItemViewModel) {
 }
 
 @Composable
-private fun DeckItemDialogImport(viewModel: DeckItemViewModel) {
+private fun DialogImport(viewModel: DeckItemViewModel) {
     AnimatedVisibility(
         visible = viewModel.dialogMode.value is DeckItemDialogMode.ImportCards,
         enter = fadeIn(animationSpec = tween<Float>(durationMillis = 300)),
@@ -309,9 +327,9 @@ private fun DeckItemDialogImport(viewModel: DeckItemViewModel) {
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "Import to deck", style = TextStyle(
+                        stringResource(R.string.import_to_deck), style = TextStyle(
                             fontSize = 20.sp,
-                            fontFamily = fugazOneFontFamily,
+                            fontFamily = nunitoVariableFont,
                             color = AppContentColor
                         )
                     )
@@ -337,7 +355,7 @@ private fun DeckItemDialogImport(viewModel: DeckItemViewModel) {
                             .height(20.dp)
                     )
                     AppBorderButton(
-                        "Add cards", {
+                        stringResource(R.string.add_cards), {
                             viewModel.addImportCards()
                         }, modifier = Modifier
                             .fillMaxSize()
@@ -349,7 +367,7 @@ private fun DeckItemDialogImport(viewModel: DeckItemViewModel) {
 }
 
 @Composable
-private fun DeckItemDialogChangeName(viewModel: DeckItemViewModel) {
+private fun DialogChangeName(viewModel: DeckItemViewModel) {
 
     AnimatedVisibility(
         visible = viewModel.dialogMode.value is DeckItemDialogMode.ChangeDeckName,
@@ -386,9 +404,9 @@ private fun DeckItemDialogChangeName(viewModel: DeckItemViewModel) {
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "New name", style = TextStyle(
+                        stringResource(R.string.new_name), style = TextStyle(
                             fontSize = 30.sp,
-                            fontFamily = fugazOneFontFamily,
+                            fontFamily = nunitoVariableFont,
                             color = AppContentColor
                         )
                     )
@@ -406,7 +424,7 @@ private fun DeckItemDialogChangeName(viewModel: DeckItemViewModel) {
                         modifier = Modifier
                             .height(10.dp)
                     )
-                    AppBorderButton("CHANGE", {
+                    AppBorderButton(stringResource(R.string.change), {
                         viewModel.changeDeckName()
                     }, modifier = Modifier)
                 }
@@ -416,7 +434,7 @@ private fun DeckItemDialogChangeName(viewModel: DeckItemViewModel) {
 }
 
 @Composable
-private fun DeckItemDialogRemoveCard(viewModel: DeckItemViewModel) {
+fun DialogRemoveCard(viewModel: DeckItemViewModel) {
     AnimatedVisibility(
         visible = viewModel.dialogMode.value is DeckItemDialogMode.RemoveCard,
         enter = fadeIn(animationSpec = tween<Float>(durationMillis = 300)),
@@ -452,9 +470,9 @@ private fun DeckItemDialogRemoveCard(viewModel: DeckItemViewModel) {
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "Delete card?", style = TextStyle(
+                        stringResource(R.string.remove_card), style = TextStyle(
                             fontSize = 30.sp,
-                            fontFamily = fugazOneFontFamily,
+                            fontFamily = nunitoVariableFont,
                             color = AppCardItemContentColor
                         )
                     )
@@ -466,11 +484,11 @@ private fun DeckItemDialogRemoveCard(viewModel: DeckItemViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        AppBorderButton("YES", {
+                        AppBorderButton(stringResource(R.string.yes), {
                             viewModel.deleteCard()
                         }, modifier = Modifier.width(150.dp))
                         Spacer(modifier = Modifier.width(15.dp))
-                        AppBorderButton("NO", {
+                        AppBorderButton(stringResource(R.string.no), {
                             viewModel.cancelDeleting()
                         }, modifier = Modifier.width(150.dp))
                     }
@@ -517,7 +535,7 @@ private fun CardItemView(card: Card, onFlip: () -> Unit, onDelete: () -> Unit) {
             Text(
                 card.firstWord, style = TextStyle(
                     fontSize = 20.sp,
-                    fontFamily = fugazOneFontFamily,
+                    fontFamily = nunitoVariableFont,
                     color = AppCardItemContentColor
                 )
             )
@@ -528,19 +546,19 @@ private fun CardItemView(card: Card, onFlip: () -> Unit, onDelete: () -> Unit) {
             ) {
                 Icon(
                     imageVector = Icons.Default.Favorite,
-                    contentDescription = "Learned Status",
+                    contentDescription = stringResource(R.string.learn_status),
                     tint = learnedStatusColor
                 )
                 Text(
                     card.countOfRepeating.toString(), style = TextStyle(
                         fontSize = 20.sp,
-                        fontFamily = fugazOneFontFamily,
+                        fontFamily = nunitoVariableFont,
                         color = AppCardItemBackgroundColor
                     )
                 )
                 Icon(
                     imageVector = Icons.Default.Clear,
-                    contentDescription = "Delete Card",
+                    contentDescription = stringResource(R.string.remove_card),
                     tint = AppContentColor,
                     modifier = Modifier.clickable() {
                         onDelete()

@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.example.echolex.ui.theme.AppButtonBackgroundColor
 import com.example.echolex.ui.theme.AppButtonBorderColor
 import com.example.echolex.ui.theme.AppButtonContentColor
-import com.example.echolex.ui.theme.calSansFontFamily
+import com.example.echolex.ui.theme.nunitoVariableFont
 
 @Composable
 fun AppBorderButton(
@@ -29,25 +29,26 @@ fun AppBorderButton(
     onClick: () -> Unit,
     backgroundColor: Color = AppButtonBackgroundColor,
     borderColor: Color = AppButtonBorderColor,
-    borderWidth: Dp = 3.dp,
-    modifier: Modifier
+    borderWidth: Dp = 2.dp,
+    modifier: Modifier = Modifier,
+    textSize: Int = 25
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
-            .clip(RoundedCornerShape(11.dp))
+            .clip(RoundedCornerShape(15.dp))
             .background(backgroundColor)
-            .border(borderWidth, borderColor, RoundedCornerShape(11.dp))
+            .border(borderWidth, borderColor, RoundedCornerShape(15.dp))
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
             style = TextStyle(
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Normal,
-                fontFamily = calSansFontFamily,
+                fontSize = textSize.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = nunitoVariableFont,
                 color = AppButtonContentColor
             )
         )

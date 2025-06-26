@@ -1,7 +1,7 @@
 package com.example.echolex.core.domain.service
 
 import android.content.Context
-import com.example.echolex.core.data.model.dataclass.Deck
+import com.example.echolex.core.domain.data.model.deck.Deck
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import java.io.File

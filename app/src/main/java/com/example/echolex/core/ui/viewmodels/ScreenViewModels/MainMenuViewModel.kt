@@ -6,12 +6,11 @@ import androidx.lifecycle.viewModelScope
 import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
-import com.example.echolex.core.domain.service.centralScreenService.NavigationCenter
-import com.example.echolex.core.domain.useCase.screensUseCases.AllCardsStats
-import com.example.echolex.core.domain.useCase.screensUseCases.GetAllCardsStatUseCase
+import com.example.echolex.core.domain.useCase.deck.AllCardsStats
+import com.example.echolex.core.domain.useCase.deck.GetDecksCopyStatUseCase
+import com.example.echolex.core.domain.useCase.screensUseCases.NavigateToScreenUseCase
 import com.example.echolex.core.navigation.NavigationTarget.DeckScreens
 import com.example.echolex.core.navigation.NavigationTarget.LessonScreens
-import com.example.echolex.core.navigation.NavigationTarget.LessonSettingsScreens
 import com.example.echolex.ui.theme.AppCardItemLearnedStatusColor
 import com.example.echolex.ui.theme.AppCardItemNotLearnedStatusColor
 import com.example.echolex.ui.theme.AppCardItemPreLearnedStatusColor
@@ -24,8 +23,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainMenuViewModel @Inject constructor(
-    private val getAllCardsStatUseCase: GetAllCardsStatUseCase,
-    private val navigationCenter: NavigationCenter
+    private val getDecksCopyStatUseCase: GetDecksCopyStatUseCase,
+    private val navigateToScreenUseCase: NavigateToScreenUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MainMenuUiState>(MainMenuUiState.Loading)
@@ -47,7 +46,7 @@ class MainMenuViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = MainMenuUiState.Loading
 
-            val result = getAllCardsStatUseCase()
+            val result = getDecksCopyStatUseCase()
 
             if (result.isSuccess) {
                 val stats = result.getOrNull()
@@ -91,21 +90,12 @@ class MainMenuViewModel @Inject constructor(
     }
 
     fun openDecksMenu() {
-        navigationCenter.navigate(DeckScreens.DecksMenu)
-    }
-
-    fun openLessonSettingsMenu() {
-        navigationCenter.navigate(LessonSettingsScreens.LessonSettings)
+        navigateToScreenUseCase(DeckScreens.DecksMenu)
     }
 
     fun openLessonMenu() {
-        navigationCenter.navigate(LessonScreens.Lesson)
+        navigateToScreenUseCase(LessonScreens.Lesson)
     }
-
-    fun onRetry() {
-        loadInitialData()
-    }
-
 }
 
 sealed class MainMenuUiState {

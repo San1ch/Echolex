@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.example.echolex.ui.theme.AppButtonBackgroundColor
 import com.example.echolex.ui.theme.AppButtonContentColor
-import com.example.echolex.ui.theme.fugazOneFontFamily
+import com.example.echolex.ui.theme.nunitoVariableFont
 
 @Composable
 fun AppStrokedText(
@@ -22,7 +22,7 @@ fun AppStrokedText(
     strokeColor: Color = AppButtonBackgroundColor,
     textColor: Color = AppButtonContentColor,
     strokeWidth: Float = 4f,
-    fontFamily: FontFamily = fugazOneFontFamily,
+    fontFamily: FontFamily = nunitoVariableFont,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {

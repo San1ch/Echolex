@@ -1,7 +1,7 @@
 package com.example.echolex.core.domain.service
 
-import com.example.echolex.core.data.model.dataclass.Card
-import com.example.echolex.core.data.model.dataclass.Deck
+import com.example.echolex.core.domain.data.model.deck.Card
+import com.example.echolex.core.domain.data.model.deck.Deck
 import javax.inject.Qualifier
 import javax.inject.Inject
 
@@ -35,7 +35,7 @@ class DeckImportCreator @Inject constructor(
                         Card(
                             firstWord = word,
                             secondWord = translation,
-                            isPreLearnedCard = data.isMarkedPreLearning
+                            isPreLearnedCard = data.isPreLearned
                         )
                     } else null
                 } else null
@@ -46,7 +46,7 @@ class DeckImportCreator @Inject constructor(
 data class DataDeck(
     val name: String,
     val words: String,
-    val isMarkedPreLearning: Boolean
+    val isPreLearned: Boolean
 )
 
 @Qualifier

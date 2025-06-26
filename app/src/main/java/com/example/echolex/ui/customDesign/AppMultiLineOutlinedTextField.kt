@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.example.echolex.ui.theme.AppButtonBackgroundColor
 import com.example.echolex.ui.theme.AppButtonBorderColor
 import com.example.echolex.ui.theme.AppButtonContentColor
-import com.example.echolex.ui.theme.fugazOneFontFamily
+import com.example.echolex.ui.theme.nunitoVariableFont
 
 @Composable
 fun AppMultiLineOutlinedTextField(
@@ -28,7 +28,7 @@ fun AppMultiLineOutlinedTextField(
     placeholderColor: Color = AppButtonContentColor,
     textStyle: TextStyle = TextStyle(
         fontSize = 15.sp,
-        fontFamily = fugazOneFontFamily,
+        fontFamily = nunitoVariableFont,
         color = AppButtonContentColor
     ),
     minLines: Int = 3,

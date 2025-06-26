@@ -5,70 +5,66 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.echolex.core.domain.service.DataDeck
-import com.example.echolex.core.domain.service.centralScreenService.NavigationCenter
-import com.example.echolex.core.domain.service.centralScreenService.NotificationCenter
-import com.example.echolex.core.domain.useCase.CreateImportDeckUseCase
-import com.example.echolex.core.navigation.NavigationTarget.DeckScreens
+import com.example.echolex.core.domain.useCase.screensUseCases.BackToPreviousScreenUseCase
+import com.example.echolex.core.domain.useCase.deck.CreateImportDeckUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class DeckImportUiState(
+    val nameText: String = "",
+    val importText: String = "",
+    val markAsPreLearned: Boolean = false
+)
 @HiltViewModel
 class DeckImportViewModel @Inject constructor(
     private val createImportDeckUseCase: CreateImportDeckUseCase,
-    private val notificationCenter: NotificationCenter,
-    private val navigationCenter: NavigationCenter
+    private val backToPreviousScreenUseCase: BackToPreviousScreenUseCase
 ) : ViewModel() {
-    private var _nameTextField = mutableStateOf("")
-    val nameTextField: State<String> get() = _nameTextField
 
-    private val _importTextField = mutableStateOf("")
-    val importTextField: State<String> get() = _importTextField
-
-    private val _isMarkingLikePreLearned = mutableStateOf(false)
-    val isMarkingLikePreLearned: State<Boolean> get() = _isMarkingLikePreLearned
-
-    fun openDeckMenu() {
-        navigationCenter.navigate(DeckScreens.DecksMenu)
-    }
+    private val _uiState = mutableStateOf(DeckImportUiState())
+    val uiState: State<DeckImportUiState> get() = _uiState
 
     fun onNameTextChanged(newName: String) {
-        _nameTextField.value = newName
+        _uiState.value = _uiState.value.copy(nameText = newName)
     }
 
     fun onImportTextChanged(newText: String) {
-        _importTextField.value = newText
+        _uiState.value = _uiState.value.copy(importText = newText)
     }
 
     fun toggleMarkAsPreLearned() {
-        _isMarkingLikePreLearned.value = !isMarkingLikePreLearned.value
-    }
-
-     fun startCreatingDeck() {
-        viewModelScope.launch {
-            val isCreated = createImportDeckUseCase(buildData())
-            if(isCreated) {
-                openDeckMenu()
-            }
-        }
-    }
-
-
-    private fun buildData(): DataDeck {
-        return DataDeck(
-            _nameTextField.value,
-            _importTextField.value,
-            _isMarkingLikePreLearned.value
+        _uiState.value = _uiState.value.copy(
+            markAsPreLearned = !_uiState.value.markAsPreLearned
         )
     }
 
     fun pasteImportText(newText: String) {
-        _importTextField.value = newText
+        _uiState.value = _uiState.value.copy(importText = newText)
     }
 
     fun clearImportText() {
-        _importTextField.value = ""
+        _uiState.value = _uiState.value.copy(importText = "")
     }
 
-}
+    fun startCreatingDeck() {
+        viewModelScope.launch {
+            if (createImportDeckUseCase(buildData())) {
+                backToPreviousScreenUseCase()
+            }
+        }
+    }
 
+    private fun buildData(): DataDeck {
+        val state = _uiState.value
+        return DataDeck(
+            name = state.nameText,
+            words = state.importText,
+            isPreLearned = state.markAsPreLearned
+        )
+    }
+
+    fun openDeckMenu() {
+        backToPreviousScreenUseCase()
+    }
+}

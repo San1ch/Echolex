@@ -9,13 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun StandardStart(content: @Composable () -> Unit) {
+fun StandardStart(padding: Int = 15, content: @Composable () -> Unit) {
     Box {
-        StandardImageBackground()
+        StandardAppBackground()
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(15.dp)
+                .padding(padding.dp)
         ) {
             content()
         }

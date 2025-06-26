@@ -16,7 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.echolex.core.data.model.AppNotification
+import com.example.echolex.core.domain.data.model.notification.AppNotification
 import com.example.echolex.core.navigation.NavigationTarget
 import com.example.echolex.core.ui.viewmodels.CenterProgramViewModel
 import com.example.echolex.ui.customDesign.NotificationWindow
@@ -24,12 +24,10 @@ import com.example.echolex.ui.screens.DeckImportScreenRoute
 import com.example.echolex.ui.screens.DeckItemScreenRoute
 import com.example.echolex.ui.screens.DecksMenuScreenRoute
 import com.example.echolex.ui.screens.LessonMenuScreenRoute
-import com.example.echolex.ui.screens.LessonSettingsMenuScreenRoute
 import com.example.echolex.ui.screens.MainScreen.DeckMenuScreen.DeckImportScreen.DeckImportScreen
 import com.example.echolex.ui.screens.MainScreen.DeckMenuScreen.DeckItemScreen.DeckItemScreen
 import com.example.echolex.ui.screens.MainScreen.DeckMenuScreen.DecksScreen
 import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.LessonScreen
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.LessonSettingsScreen
 import com.example.echolex.ui.screens.MainScreen.MainScreen
 import com.example.echolex.ui.screens.MainScreenRoute
 import dagger.hilt.android.AndroidEntryPoint
@@ -71,7 +69,6 @@ fun CenterProgramScreen(viewModel: CenterProgramViewModel = hiltViewModel()) {
         composable(DeckItemScreenRoute) { DeckItemScreen() }
         composable(DeckImportScreenRoute) { DeckImportScreen() }
         composable(LessonMenuScreenRoute) { LessonScreen() }
-        composable(LessonSettingsMenuScreenRoute) { LessonSettingsScreen() }
     }
 
     CenterProgramNotification(viewModel)
@@ -84,7 +81,7 @@ private fun CenterProgramNotification(viewModel: CenterProgramViewModel) {
 
     if (notificationState.value !is AppNotification.Null) {
         val notification = notificationState.value
-        NotificationWindow(notification.title, notification.message, {
+        NotificationWindow(notification.title, notification.message, onDismiss = {
             viewModel.closeNotification()
         })
     }
@@ -93,10 +90,16 @@ private fun CenterProgramNotification(viewModel: CenterProgramViewModel) {
 @Composable
 fun CenterProgramNavigation(viewModel: CenterProgramViewModel, navController: NavController) {
     val navigationTarget = viewModel.navigationTarget.collectAsState()
+    val shouldNavigateBack = viewModel.shouldNavigateBack.collectAsState()
 
     if (navigationTarget.value !is NavigationTarget.NullScreen) {
         navController.navigate(navigationTarget.value.route)
         viewModel.resetNavigationTarget()
+    }
+
+    if (shouldNavigateBack.value) {
+        navController.popBackStack()
+        viewModel.resetBackMode()
     }
 }
 

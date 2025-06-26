@@ -3,16 +3,14 @@ package com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.echolex.core.data.local.useCases.GetSharedDeckNameUseCase
-import com.example.echolex.core.data.model.dataclass.Card
-import com.example.echolex.core.data.model.dataclass.Deck
-import com.example.echolex.core.domain.service.centralScreenService.NavigationCenter
-import com.example.echolex.core.domain.useCase.deckStore.AddCardsToDeckUseCase
-import com.example.echolex.core.domain.useCase.deckStore.ChangeDeckNameUseCase
-import com.example.echolex.core.domain.useCase.deckStore.GetDeckByNameUseCase
-import com.example.echolex.core.domain.useCase.deckStore.RemoveCardInDeckUseCase
-import com.example.echolex.core.domain.useCase.deckStore.RemoveDeckUseCase
-import com.example.echolex.core.navigation.NavigationTarget.DeckScreens
+import com.example.echolex.core.domain.data.local.GetSharedStateUseCase
+import com.example.echolex.core.domain.data.model.deck.Card
+import com.example.echolex.core.domain.data.model.deck.Deck
+import com.example.echolex.core.domain.useCase.deck.AddCardsToDeckUseCase
+import com.example.echolex.core.domain.useCase.deck.ChangeDeckNameUseCase
+import com.example.echolex.core.domain.useCase.deck.GetDeckByNameUseCase
+import com.example.echolex.core.domain.useCase.deck.RemoveCardInDeckUseCase
+import com.example.echolex.core.domain.useCase.deck.RemoveDeckUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +18,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.runtime.State
+import com.example.echolex.core.domain.data.model.notification.AppNotification
+import com.example.echolex.core.domain.data.repository.SharedDataMemoryStoreState
 import com.example.echolex.core.domain.service.DataDeck
+import com.example.echolex.core.domain.useCase.deck.GetCardExportStringUseCase
+import com.example.echolex.core.domain.useCase.screensUseCases.BackToPreviousScreenUseCase
+import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
 import kotlinx.coroutines.flow.first
 
 @HiltViewModel
@@ -30,15 +33,21 @@ class DeckItemViewModel @Inject constructor(
     private val getDeckByNameUseCase: GetDeckByNameUseCase,
     private val removeCardInDeckUseCase: RemoveCardInDeckUseCase,
     private val addCardsToDeckUseCase: AddCardsToDeckUseCase,
-    private val navigationCenter: NavigationCenter,
-    private val getSharedDeckNameUseCase: GetSharedDeckNameUseCase
+    private val getSharedStateUseCase: GetSharedStateUseCase,
+    private val backToPreviousScreenUseCase: BackToPreviousScreenUseCase,
+    private val getCardExportStringUseCase: GetCardExportStringUseCase,
+    private val openAppNotificationUseCase: OpenAppNotificationUseCase
 ) : ViewModel() {
-    private val deckName: StateFlow<String> = getSharedDeckNameUseCase()
+    private val deckName: StateFlow<SharedDataMemoryStoreState> = getSharedStateUseCase()
 
     val screenDeck: StateFlow<Deck> =
-        getDeckByNameUseCase(deckName.value).stateIn(viewModelScope, SharingStarted.Eagerly, Deck("TEMP_TEST"))
+        getDeckByNameUseCase(deckName.value.deckNameForItemDeckInfo).stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            Deck("TEMP_TEST")
+        )
 
-    private val _localDeck = mutableStateOf(Deck(name = deckName.value))
+    private val _localDeck = mutableStateOf(Deck(name = deckName.value.deckNameForItemDeckInfo))
     val localDeck: State<Deck> = _localDeck
 
 
@@ -51,9 +60,6 @@ class DeckItemViewModel @Inject constructor(
     val dialogMode = mutableStateOf<DeckItemDialogMode>(DeckItemDialogMode.Null)
 
 
-    var screenState = mutableStateOf<ScreenUiLaunching>(ScreenUiLaunching.Loading)
-        private set
-
     init {
         viewModelScope.launch {
             copyToLocal()
@@ -61,10 +67,12 @@ class DeckItemViewModel @Inject constructor(
     }
 
 
-    fun navigateDeckMenu() {
-        navigationCenter.navigate(DeckScreens.DecksMenu)
-
+    fun backScreen() {
+        viewModelScope.launch {
+            backToPreviousScreenUseCase()
+        }
     }
+
     fun onImportChange(text: String) {
         importTextField.value = text
     }
@@ -98,7 +106,7 @@ class DeckItemViewModel @Inject constructor(
         closeDialogMode()
         viewModelScope.launch {
             removeDeckUseCase(localDeck.value.name)
-            navigateDeckMenu()
+            backScreen()
         }
     }
 
@@ -129,9 +137,12 @@ class DeckItemViewModel @Inject constructor(
 
     fun addImportCards() {
         viewModelScope.launch {
-            val changed = addCardsToDeckUseCase(screenDeck.value.name, DataDeck("", importTextField.value, isMarkingLikePreLearned.value))
-            if(changed){
-                navigationCenter.navigate(DeckScreens.DecksMenu)
+            val changed = addCardsToDeckUseCase(
+                screenDeck.value.name,
+                DataDeck("", importTextField.value, isMarkingLikePreLearned.value)
+            )
+            if (changed) {
+                backToPreviousScreenUseCase()
             }
         }
         closeDialogMode()
@@ -142,17 +153,27 @@ class DeckItemViewModel @Inject constructor(
         val newName = changedNameTextField.value
         viewModelScope.launch {
             val changed = changeDeckNameUseCase(newName, currentName)
-            if(changed){
-                navigationCenter.navigate(DeckScreens.DecksMenu)
+            if (changed) {
+                backToPreviousScreenUseCase()
             }
         }
     }
 
+    private fun buildDeckData(): DataDeck {
+        return DataDeck("", importTextField.value, isMarkingLikePreLearned.value)
+    }
 
-
-    suspend fun copyToLocal(){
+    suspend fun copyToLocal() {
         val deck = screenDeck.first()
         _localDeck.value = deck.copy()
+    }
+
+    fun exportDeck(onExportReady: (String) -> Unit) {
+        viewModelScope.launch {
+            val text: String = getCardExportStringUseCase(screenDeck.value.name)
+            onExportReady(text)
+            openAppNotificationUseCase(AppNotification.Success.DeckExported)
+        }
     }
 
     sealed class DeckItemDialogMode() {
@@ -163,7 +184,7 @@ class DeckItemViewModel @Inject constructor(
         data object RemoveDeck : DeckItemDialogMode()
     }
 
-    sealed class ScreenUiLaunching(){
+    sealed class ScreenUiLaunching() {
         data object Loading : ScreenUiLaunching()
         data class Success(val deck: Deck) : ScreenUiLaunching()
         data class Error(val message: String) : ScreenUiLaunching()

@@ -32,8 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -44,20 +45,22 @@ import com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels.De
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels.DialogState
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels.DialogType
 import com.example.echolex.ui.customDesign.AppBorderButton
+import com.example.echolex.ui.customDesign.AppButton
 import com.example.echolex.ui.customDesign.AppOutlinedTextField
 import com.example.echolex.ui.customDesign.StandardStart
 import com.example.echolex.ui.theme.AppButtonBackgroundColor
 import com.example.echolex.ui.theme.AppButtonContentColor
-import com.example.echolex.ui.theme.calSansFontFamily
-import com.example.echolex.ui.theme.fugazOneFontFamily
+import com.example.echolex.ui.theme.AppContentBlackColor
+import com.example.echolex.ui.theme.AppContentColor
+import com.example.echolex.ui.theme.nunitoVariableFont
 
 @Composable
 fun DecksScreen(viewModel: DecksMenuViewModel = hiltViewModel()) {
-    LessonSettingsMenuScreenContent(viewModel)
+    DecksScreenContent(viewModel)
 }
 
 @Composable
-fun LessonSettingsMenuScreenContent(viewModel: DecksMenuViewModel) {
+fun DecksScreenContent(viewModel: DecksMenuViewModel) {
     val decks by viewModel.decks.collectAsState()
     val dialogState by viewModel.dialogState.collectAsState()
 
@@ -71,23 +74,35 @@ fun LessonSettingsMenuScreenContent(viewModel: DecksMenuViewModel) {
             ) {
                 //Header
                 Box() {
+
+                    Spacer(
+                        modifier = Modifier
+                            .height(20.dp)
+                    )
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(), horizontalArrangement = Arrangement.Center
                     ) {
+                        Spacer(
+                            modifier = Modifier
+                                .height(150.dp)
+                        )
                         Row() {
                             Text(
-                                "DECK COUNT: ", style = TextStyle(
+                                stringResource(R.string.deck_count), style = TextStyle(
                                     fontSize = 20.sp,
-                                    fontFamily = fugazOneFontFamily,
-                                    color = colorResource(id = R.color.black)
+                                    fontFamily = nunitoVariableFont,
+                                    color = AppContentColor,
+                                    fontWeight = FontWeight.Bold
                                 )
                             )
                             Text(
                                 decks.size.toString(), style = TextStyle(
                                     fontSize = 20.sp,
-                                    fontFamily = fugazOneFontFamily,
-                                    color = colorResource(id = R.color.black)
+                                    fontFamily = nunitoVariableFont,
+                                    color = AppContentColor,
+                                    fontWeight = FontWeight.Bold
                                 )
                             )
                         }
@@ -115,12 +130,10 @@ fun LessonSettingsMenuScreenContent(viewModel: DecksMenuViewModel) {
                     }
                 }
                 //Bottom Part
-                AppBorderButton("CREATE DECK", {
+                AppButton(text = stringResource(R.string.create_deck), onClick = {
                     viewModel.openChooseModeDialog()
                 }, modifier = Modifier)
             }
-
-
         }
     }
     Dialogs(dialogState, viewModel)
@@ -205,8 +218,9 @@ fun ItemDeckBoard(
                     nameOfDeck,
                     style = TextStyle(
                         fontSize = 20.sp,
-                        fontFamily = fugazOneFontFamily,
-                        color = colorResource(id = R.color.black)
+                        fontFamily = nunitoVariableFont,
+                        color = AppContentBlackColor,
+                        fontWeight = FontWeight.Bold
                     )
                 )
             }
@@ -217,15 +231,15 @@ fun ItemDeckBoard(
                     .padding(10.dp)
             ) {
                 Column(modifier = Modifier.weight(10f)) {
-                    InfoRow("Count of card:", countOfCards, fontSize)
-                    InfoRow("Learned cards:", countOfLearnedCards, fontSize)
+                    InfoRow(stringResource(R.string.count_of_card), countOfCards, fontSize)
+                    InfoRow(stringResource(R.string.learned_cards), countOfLearnedCards, fontSize)
                 }
 
                 Spacer(modifier = Modifier.width(20.dp))
 
                 Column(modifier = Modifier.weight(12f)) {
-                    InfoRow("Pre-Learned Cards:", countOfPreLearnedCards, fontSize)
-                    InfoRow("Not Learned cards:", countOfNotLearnedCards, fontSize)
+                    InfoRow(stringResource(R.string.pre_learned_cards), countOfPreLearnedCards, fontSize)
+                    InfoRow(stringResource(R.string.not_learned_cards), countOfNotLearnedCards, fontSize)
                 }
             }
         }
@@ -242,16 +256,18 @@ fun InfoRow(label: String, value: String, fontSize: TextUnit) {
             label,
             style = TextStyle(
                 fontSize = fontSize,
-                fontFamily = calSansFontFamily,
-                color = colorResource(id = R.color.black)
+                fontFamily = nunitoVariableFont,
+                color = AppContentBlackColor,
+                fontWeight = FontWeight.Medium
             )
         )
         Text(
             value,
             style = TextStyle(
                 fontSize = fontSize,
-                fontFamily = calSansFontFamily,
-                color = colorResource(id = R.color.black)
+                fontFamily = nunitoVariableFont,
+                color = AppContentBlackColor,
+                fontWeight = FontWeight.Medium
             )
         )
     }
@@ -290,11 +306,11 @@ fun CreateDeckChooseDialog(
                 .padding(24.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                AppBorderButton("IMPORT LIST", {
+                AppBorderButton(stringResource(R.string.import_list), {
                     onOpenImportScreen()
                 }, modifier = Modifier)
                 Spacer(modifier = Modifier.height(15.dp))
-                AppBorderButton("CREATE EMPTY", {
+                AppBorderButton(stringResource(R.string.create_empty), {
                     onEmptyCreator()
                 }, modifier = Modifier)
             }
@@ -331,7 +347,7 @@ fun CreateEmptyDeckDialog(
                 .background(AppButtonBackgroundColor)
                 .animateContentSize()
                 .clickable(
-                    onClick = { }, // блокує клік, щоб не закривало діалог
+                    onClick = { },
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() }
                 )
@@ -341,9 +357,10 @@ fun CreateEmptyDeckDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "Choose Deck Name", style = TextStyle(
+                    stringResource(R.string.choose_name), style = TextStyle(
                         fontSize = 20.sp,
-                        fontFamily = fugazOneFontFamily,
+                        fontFamily = nunitoVariableFont,
+                        fontWeight = FontWeight.Medium,
                         color = AppButtonContentColor
                     )
                 )
@@ -354,7 +371,7 @@ fun CreateEmptyDeckDialog(
                         color = Color.Red,
                         style = TextStyle(
                             fontSize = 14.sp,
-                            fontFamily = calSansFontFamily
+                            fontFamily = nunitoVariableFont
                         )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -369,7 +386,7 @@ fun CreateEmptyDeckDialog(
                     value = deckName,
                     onValueChange = { onDeckNameChanged(it) },
                     singleLine = true,
-                    placeholderText = "Deck name",
+                    placeholderText = stringResource(R.string.deck_name),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 0.dp)
@@ -383,7 +400,7 @@ fun CreateEmptyDeckDialog(
                         modifier = Modifier.padding(vertical = 10.dp)
                     )
                 } else {
-                    AppBorderButton("CREATE DECK", {
+                    AppBorderButton(stringResource(R.string.create_deck_dialog), {
                         onCreate()
                     }, modifier = Modifier.padding(vertical = 10.dp))
                 }

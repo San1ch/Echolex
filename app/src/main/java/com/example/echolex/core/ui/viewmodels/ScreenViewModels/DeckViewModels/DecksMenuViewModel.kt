@@ -2,13 +2,13 @@ package com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.echolex.core.data.local.useCases.SetSharedDeckNameUseCase
-import com.example.echolex.core.data.model.dataclass.Deck
-import com.example.echolex.core.data.model.dataclass.DeckCardsLearningStatus
+import com.example.echolex.core.domain.data.local.SetSharedDeckNameUseCase
+import com.example.echolex.core.domain.data.model.deck.Deck
+import com.example.echolex.core.domain.data.model.deck.DeckCardsLearningStatus
 import com.example.echolex.core.domain.service.DataDeck
-import com.example.echolex.core.domain.service.centralScreenService.NavigationCenter
-import com.example.echolex.core.domain.useCase.CreateEmptyDeckUseCase
-import com.example.echolex.core.domain.useCase.deckStore.GetDecksFlowUseCase
+import com.example.echolex.core.domain.useCase.deck.GetDecksFlowUseCase
+import com.example.echolex.core.domain.useCase.deck.CreateEmptyDeckUseCase
+import com.example.echolex.core.domain.useCase.screensUseCases.NavigateToScreenUseCase
 import com.example.echolex.core.navigation.NavigationTarget.DeckScreens
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class DecksMenuViewModel @Inject constructor(
     private val getDecksFlowUseCase: GetDecksFlowUseCase,
     private val createEmptyDeckUseCase: CreateEmptyDeckUseCase,
-    private val navigationCenter: NavigationCenter,
+    private val navigateToScreenUseCase: NavigateToScreenUseCase,
     private val setSharedDeckNameUseCase: SetSharedDeckNameUseCase
 ) : ViewModel() {
     val decks: StateFlow<List<Deck>> = getDecksFlowUseCase()
@@ -53,12 +53,12 @@ class DecksMenuViewModel @Inject constructor(
     fun navigateDeckInfoScreen(name: String) {
         viewModelScope.launch {
             setSharedDeckNameUseCase(name)
-            navigationCenter.navigate(DeckScreens.DeckItem)
+            navigateToScreenUseCase(DeckScreens.DeckItem)
         }
     }
 
     fun navigateImportScreen() {
-        navigationCenter.navigate(DeckScreens.DeckImport)
+        navigateToScreenUseCase(DeckScreens.DeckImport)
     }
 
     fun openChooseModeDialog() {

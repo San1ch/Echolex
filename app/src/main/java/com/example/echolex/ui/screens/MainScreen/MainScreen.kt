@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.echolex.R
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.MainMenuUiState
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.MainMenuViewModel
 import com.example.echolex.ui.customDesign.AppButton
@@ -53,19 +56,16 @@ fun MainMenuScreenContent(viewModel: MainMenuViewModel) {
                             .height(100.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        AppButton("SETTINGS", modifier = Modifier
-                            .weight(1f)
-                            .padding(5.dp, 0.dp), onClick = {
-                            viewModel.openLessonSettingsMenu()
-                        })
-                        AppButton("START", modifier = Modifier
-                            .weight(1f)
-                            .padding(5.dp, 0.dp), onClick = {
+                        AppButton(
+                            stringResource(R.string.start), modifier = Modifier
+                                .weight(1f)
+                                .padding(5.dp, 0.dp), onClick = {
                             viewModel.openLessonMenu()
                         })
-                        AppButton("DECKS", modifier = Modifier
-                            .weight(1f)
-                            .padding(5.dp, 0.dp), onClick = {
+                        AppButton(
+                            stringResource(R.string.decks), modifier = Modifier
+                                .weight(1f)
+                                .padding(5.dp, 0.dp), onClick = {
                             viewModel.openDecksMenu()
                         })
                     }
