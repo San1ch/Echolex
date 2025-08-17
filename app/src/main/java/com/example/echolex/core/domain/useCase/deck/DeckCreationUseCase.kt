@@ -5,8 +5,6 @@ import com.example.echolex.core.domain.data.model.deck.Card
 import com.example.echolex.core.domain.data.model.deck.Deck
 import com.example.echolex.core.domain.service.DataDeck
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
-import com.example.echolex.core.domain.useCase.validation.ValidateDeckImportUseCase
-import com.example.echolex.core.domain.useCase.validation.ValidateDeckNameUseCase
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -88,7 +86,7 @@ class CardParserService @Inject constructor() {
                         Card(
                             firstWord = word,
                             secondWord = translation,
-                            isPreLearnedCard = data.isPreLearned
+                            isPreLearned = data.isPreLearned
                         )
                     } else null
                 } else null

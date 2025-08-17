@@ -4,6 +4,7 @@ import com.example.echolex.ui.screens.DeckImportScreenRoute
 import com.example.echolex.ui.screens.DeckItemScreenRoute
 import com.example.echolex.ui.screens.DecksMenuScreenRoute
 import com.example.echolex.ui.screens.LessonMenuScreenRoute
+import com.example.echolex.ui.screens.LessonProcessScreenRoute
 import com.example.echolex.ui.screens.LessonSettingsMenuScreenRoute
 import com.example.echolex.ui.screens.MainScreenRoute
 
@@ -29,5 +30,7 @@ sealed class NavigationTarget(open val route: String) {
 
     sealed class LessonScreens(route: String) : NavigationTarget(route) {
         object Lesson : LessonScreens(route = LessonMenuScreenRoute)
+        object LessonProcess : LessonScreens(route = LessonProcessScreenRoute)
     }
+
 }

@@ -29,7 +29,7 @@ fun AppBorderButton(
     onClick: () -> Unit,
     backgroundColor: Color = AppButtonBackgroundColor,
     borderColor: Color = AppButtonBorderColor,
-    borderWidth: Dp = 2.dp,
+    borderWidth: Dp = 1.dp,
     modifier: Modifier = Modifier,
     textSize: Int = 25
 ) {

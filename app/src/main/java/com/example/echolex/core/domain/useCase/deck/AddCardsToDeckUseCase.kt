@@ -3,10 +3,10 @@ package com.example.echolex.core.domain.useCase.deck
 import com.example.echolex.core.domain.data.model.notification.AppNotification
 import com.example.echolex.core.domain.data.model.deck.Card
 import com.example.echolex.core.domain.data.model.deck.Deck
+import com.example.echolex.core.domain.data.repository.DeckFindResult
 import com.example.echolex.core.domain.data.repository.DeckMemoryStore
 import com.example.echolex.core.domain.service.DataDeck
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
-import com.example.echolex.core.domain.useCase.validation.ValidateDeckImportUseCase
 import javax.inject.Inject
 
 class AddCardsToDeckUseCase @Inject constructor(
@@ -16,29 +16,35 @@ class AddCardsToDeckUseCase @Inject constructor(
     private val validateDeckImportUseCase: ValidateDeckImportUseCase
 ) {
     suspend operator fun invoke(nameDeckToAdd: String, dataDeck: DataDeck): Boolean {
-        val foundDeck = deckMemoryStore.getDeckByName(nameDeckToAdd)
-        if (foundDeck == null) {
-            openAppNotificationUseCase(AppNotification.Business.SameDeckName)
-            return false
+        val foundDeckResult = deckMemoryStore.getDeckByName(nameDeckToAdd)
+        when (foundDeckResult) {
+            is DeckFindResult.NotFound -> {
+                openAppNotificationUseCase(AppNotification.Business.DeckDoesNotExist)
+                return false
+            }
+
+            is DeckFindResult.Success -> {
+                val foundDeck = foundDeckResult.deck
+
+                var notification = validateDeckImportUseCase(dataDeck.words)
+                if (notification != AppNotification.Null) {
+                    openAppNotificationUseCase(notification)
+                    return false
+                }
+
+                val cards = parserService.parseCards(dataDeck)
+                val sameCardName = findingSameCard(cards, foundDeck.cards)
+                if (sameCardName.isNotEmpty()) {
+                    AppNotification.Business.SameCards(sameCardName)
+                    return false
+                }
+
+                deckMemoryStore.updateDeck(Deck(nameDeckToAdd, cards + foundDeck.cards))
+
+                openAppNotificationUseCase(AppNotification.Null)
+                return true
+            }
         }
-
-        var notification = validateDeckImportUseCase(dataDeck.words)
-        if (notification != AppNotification.Null) {
-            openAppNotificationUseCase(notification)
-            return false
-        }
-
-        val cards = parserService.parseCards(dataDeck)
-        val sameCardName = findingSameCard(cards, foundDeck.cards)
-        if (sameCardName.isNotEmpty()) {
-            AppNotification.Business.SameCards(sameCardName)
-            return false
-        }
-
-        deckMemoryStore.updateDeck(Deck(nameDeckToAdd, cards + foundDeck.cards))
-
-        openAppNotificationUseCase(AppNotification.Null)
-        return true
     }
 
 

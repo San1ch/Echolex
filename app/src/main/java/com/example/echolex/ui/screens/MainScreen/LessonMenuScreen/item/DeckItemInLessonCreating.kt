@@ -1,4 +1,4 @@
-package com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.item
+package com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,8 +11,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
@@ -25,8 +24,7 @@ import com.example.echolex.ui.theme.nunitoVariableFont
 
 
 @Composable
-fun DeckItemInLessonCreating(deckName: String, countOfCards: String, onClick: () -> Unit) {
-    val checkBoxState = remember { mutableStateOf(false) }
+fun DeckItemInLessonCreating(deckName: String, countOfCards: String, isChecked: Boolean,  onCheckedChange: (Boolean) -> Unit) {
     val cornerAndBorder = 5
     Box(
         modifier = Modifier
@@ -39,11 +37,11 @@ fun DeckItemInLessonCreating(deckName: String, countOfCards: String, onClick: ()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
+                .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically
         ) {
             AppCheckbox(
-                checked = checkBoxState.value,
-                onCheckedChange = { checkBoxState.value = it },
+                checked = isChecked,
+                onCheckedChange = onCheckedChange,
             )
             Text(
                 deckName, style = TextStyle(

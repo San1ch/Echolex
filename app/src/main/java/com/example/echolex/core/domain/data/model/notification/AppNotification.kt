@@ -103,12 +103,31 @@ sealed interface AppNotification {
 
         object BlueprintsDoNotExist : Business {
             override val title = "Error"
-            override val message = "Blueprint doesn't exist"
+            override val message = "Blueprints don`t exist. You need to create a blueprint first."
+        }
+
+        object BlueprintDoesNotExist : Business {
+            override val title = "Error"
+            override val message = "Blueprint doesn't exist. You need to create a blueprint first."
         }
 
         object BlueprintsStagesAreEmpty : Business {
             override val title = "Error"
             override val message = "You need to have at least one stage in the blueprint"
+        }
+
+        object LessonDecksAreEmpty : Business {
+            override val title = "Error"
+            override val message = "You need to have at least one deck in the lesson"
+        }
+
+        object LessonBlueprintsAreEmpty : Business {
+            override val title = "Error"
+            override val message = "You need to have at least one blueprint in the lesson"
+        }
+        object LessonDoesNotExist : Business {
+            override val title = "Error"
+            override val message = "Lesson doesn't exist"
         }
     }
 }

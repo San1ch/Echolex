@@ -1,4 +1,4 @@
-package com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen
+package com.example.echolex.ui.screens.MainScreen.LessonMenuScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
@@ -24,10 +25,12 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,13 +49,17 @@ import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsVie
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuUiState
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuViewModel
 import com.example.echolex.ui.customDesign.StandardAppBackground
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog.ChooseSelectionModeDialog
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog.ChooseSelectionModeInfoDialog
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog.ChooseStageModeDialog
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog.CreateBlueprintDialog
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog.CreateBlueprintStageDialog
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog.CreateLessonDialog
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog.DeleteStageInCreateDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.CreateBlueprintDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.CreateLessonDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.DeleteLessonDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.OpenBlueprintDeleteDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.ChooseStageModeDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.ChooseSelectionModeDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.ChooseSelectionModeInfoDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.CreateBlueprintStageDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.DeleteStageInCreateDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.item.LessonItem
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.item.BlueprintItem
 import com.example.echolex.ui.theme.AppButtonBackgroundColor
 import com.example.echolex.ui.theme.AppContentColor
 import com.example.echolex.ui.theme.AppTransparencyColor
@@ -78,11 +85,7 @@ fun DialogList(viewModel: LessonMenuViewModel = hiltViewModel()) {
             CreateBlueprintDialog(viewModel)
         }
 
-        LessonMenuDialogState.CreateBlueprintStage -> {
-            CreateBlueprintStageDialog(viewModel)
-        }
-
-        LessonMenuDialogState.ChoseStageMode -> {
+        LessonMenuDialogState.ChooseStageMode -> {
             ChooseStageModeDialog(viewModel)
         }
 
@@ -90,7 +93,19 @@ fun DialogList(viewModel: LessonMenuViewModel = hiltViewModel()) {
             DeleteStageInCreateDialog(viewModel)
         }
 
-        LessonMenuDialogState.ChoseSelectionMode -> {
+        LessonMenuDialogState.DeleteBlueprint -> {
+            OpenBlueprintDeleteDialog(viewModel)
+        }
+
+        LessonMenuDialogState.DeleteLesson -> {
+            DeleteLessonDialog(viewModel)
+        }
+
+        LessonMenuDialogState.CreateBlueprintStage -> {
+            CreateBlueprintStageDialog(viewModel)
+        }
+
+        LessonMenuDialogState.ChooseSelectionMode -> {
             ChooseSelectionModeDialog(viewModel)
         }
 
@@ -99,7 +114,6 @@ fun DialogList(viewModel: LessonMenuViewModel = hiltViewModel()) {
         }
     }
 }
-
 
 @Composable
 fun LessonMenuContent(viewModel: LessonMenuViewModel = hiltViewModel()) {
@@ -111,7 +125,6 @@ fun LessonMenuContent(viewModel: LessonMenuViewModel = hiltViewModel()) {
         topBar = {
             ScreenTopBar()
         },
-
         bottomBar = {
             AppBottomBar(
                 onSettingsClick = {
@@ -158,7 +171,9 @@ private fun AppBottomBar(
                     contentDescription = stringResource(R.string.lesson_settings_settings),
                     tint = AppContentColor
                 )
-            }
+            }, colors = NavigationBarItemDefaults.colors(
+                indicatorColor = AppButtonBackgroundColor
+            )
         )
         NavigationBarItem(
             selected = uiState.value.lessonMenuScreenUiState == LessonMenuScreenUiState.Lessons,
@@ -171,7 +186,9 @@ private fun AppBottomBar(
                     contentDescription = stringResource(R.string.lesson_settings_lessons),
                     tint = AppContentColor
                 )
-            }
+            }, colors = NavigationBarItemDefaults.colors(
+                indicatorColor = AppButtonBackgroundColor
+            )
         )
     }
 }
@@ -230,13 +247,23 @@ private fun LessonsContent(viewModel: LessonMenuViewModel = hiltViewModel()) {
                 }
             } else {
                 LazyColumn() {
-                    items(lessonList.value.size) { blueprint ->
-                        BlueprintItem(onClick = {})
+                    items(lessonList.value) { lesson ->
+                        LessonItem(
+                            lessonName = lesson.name,
+                            onDelete = {
+                                viewModel.openDeleteLessonDialog(lesson)
+                            },
+                            chooseLesson = {
+                                viewModel.updateCurrentLesson(lesson)
+                            },
+                            onStartLearning = {
+                                viewModel.openLearningScreen(lesson)
+                            },
+                            isSelected = lesson == viewModel.uiState.value.currentLessonToLearn,
+                        )
                     }
                 }
             }
-
-
         }
         Row(
             modifier = Modifier
@@ -250,7 +277,7 @@ private fun LessonsContent(viewModel: LessonMenuViewModel = hiltViewModel()) {
                     .clip(RoundedCornerShape(15.dp))
                     .background(AppButtonBackgroundColor)
                     .clickable(onClick = {
-                        viewModel.createLessonButtonClick()
+                        viewModel.openCreatingLessonDialog()
                     }), contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -303,8 +330,17 @@ private fun SettingsContent(viewModel: LessonMenuViewModel = hiltViewModel()) {
                 }
             } else {
                 LazyColumn() {
-                    items(blueprintList.value.size) { blueprint ->
-                        BlueprintItem(onClick = {})
+                    items(blueprintList.value) { blueprint ->
+                        BlueprintItem(
+                            blueprintName = blueprint.name,
+                            onDelete = {
+                                viewModel.openDeleteBlueprintDialog(blueprint)
+                            }
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .height(8.dp)
+                        )
                     }
                 }
             }
@@ -335,18 +371,6 @@ private fun SettingsContent(viewModel: LessonMenuViewModel = hiltViewModel()) {
         }
     }
 }
-
-@Composable
-private fun BlueprintItem(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp)
-    ) {
-
-    }
-}
-
 
 @Composable
 fun CentralTopBarText(

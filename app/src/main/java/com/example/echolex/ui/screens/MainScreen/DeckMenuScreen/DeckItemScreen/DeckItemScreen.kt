@@ -9,7 +9,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,13 +52,9 @@ import com.example.echolex.ui.customDesign.AppOutlinedTextField
 import com.example.echolex.ui.customDesign.StandardStart
 import com.example.echolex.ui.theme.AppButtonBackgroundColor
 import com.example.echolex.ui.theme.AppButtonBorderColor
-import com.example.echolex.ui.theme.AppCardItemBackgroundColor
-import com.example.echolex.ui.theme.AppCardItemBorderColor
-import com.example.echolex.ui.theme.AppCardItemContentColor
 import com.example.echolex.ui.theme.AppCardItemLearnedStatusColor
 import com.example.echolex.ui.theme.AppCardItemNotLearnedStatusColor
 import com.example.echolex.ui.theme.AppCardItemPreLearnedStatusColor
-import com.example.echolex.ui.theme.AppContentAltColor
 import com.example.echolex.ui.theme.AppContentColor
 import com.example.echolex.ui.theme.nunitoVariableFont
 import androidx.compose.runtime.getValue
@@ -66,6 +62,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.example.echolex.R
 import com.example.echolex.ui.customDesign.AppButton
+import com.example.echolex.ui.customDesign.ItemRowBackground
+import com.example.echolex.ui.theme.AppButtonContentColor
 
 
 @Composable
@@ -95,7 +93,7 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = stringResource(R.string.remove_deck),
-                tint = AppContentAltColor,
+                tint = AppContentColor,
                 modifier = Modifier
                     .clickable() {
                         viewModel.openDeleteDeckDialog()
@@ -114,7 +112,7 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
                 localDeck.cards.size.toString(), style = TextStyle(
                     fontSize = 20.sp,
                     fontFamily = nunitoVariableFont,
-                    color = AppContentAltColor
+                    color = AppContentColor
                 )
             )
         }
@@ -134,7 +132,7 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
                             stringResource(R.string.deck_is_empty), style = TextStyle(
                                 fontSize = 20.sp,
                                 fontFamily = nunitoVariableFont,
-                                color = AppCardItemContentColor
+                                color = AppContentColor
                             )
                         )
                     }
@@ -190,7 +188,10 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
                             text = stringResource(R.string.export),
                             onClick = {
                                 viewModel.exportDeck { exportedText ->
-                                    val clip = ClipData.newPlainText(context.getString(R.string.exported_deck), exportedText)
+                                    val clip = ClipData.newPlainText(
+                                        context.getString(R.string.exported_deck),
+                                        exportedText
+                                    )
                                     clipboard.setPrimaryClip(clip)
                                 }
                             },
@@ -264,7 +265,7 @@ private fun DialogRemoveDeck(viewModel: DeckItemViewModel) {
                         stringResource(R.string.remove_deck), style = TextStyle(
                             fontSize = 30.sp,
                             fontFamily = nunitoVariableFont,
-                            color = AppCardItemContentColor
+                            color = AppButtonContentColor
                         )
                     )
                     Spacer(
@@ -473,7 +474,7 @@ fun DialogRemoveCard(viewModel: DeckItemViewModel) {
                         stringResource(R.string.remove_card), style = TextStyle(
                             fontSize = 30.sp,
                             fontFamily = nunitoVariableFont,
-                            color = AppCardItemContentColor
+                            color = AppButtonContentColor
                         )
                     )
                     Spacer(
@@ -502,8 +503,8 @@ fun DialogRemoveCard(viewModel: DeckItemViewModel) {
 private fun CardItemView(card: Card, onFlip: () -> Unit, onDelete: () -> Unit) {
 
     val learnedStatusColor =
-        if (card.isPreLearnedCard) {
-            if (card.countOfRepeating >= COUNT_OF_REPETITION_TO_LEARN) {
+        if (card.isPreLearned) {
+            if (card.repeatingCount >= COUNT_OF_REPETITION_TO_LEARN) {
                 AppCardItemLearnedStatusColor
             } else {
                 AppCardItemPreLearnedStatusColor
@@ -511,22 +512,8 @@ private fun CardItemView(card: Card, onFlip: () -> Unit, onDelete: () -> Unit) {
         } else {
             AppCardItemNotLearnedStatusColor
         }
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                color = AppCardItemBackgroundColor,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .border(
-                width = 2.dp,
-                color = AppCardItemBorderColor,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .padding(8.dp)
-            .clickable {
-                onFlip()
-            }
+    ItemRowBackground(
+        onBackgroundClick = { onFlip() },
     ) {
         Row(
             modifier = Modifier
@@ -536,7 +523,7 @@ private fun CardItemView(card: Card, onFlip: () -> Unit, onDelete: () -> Unit) {
                 card.firstWord, style = TextStyle(
                     fontSize = 20.sp,
                     fontFamily = nunitoVariableFont,
-                    color = AppCardItemContentColor
+                    color = AppButtonContentColor
                 )
             )
             Row(
@@ -549,12 +536,20 @@ private fun CardItemView(card: Card, onFlip: () -> Unit, onDelete: () -> Unit) {
                     contentDescription = stringResource(R.string.learn_status),
                     tint = learnedStatusColor
                 )
+                Spacer(
+                    modifier = Modifier
+                        .width(8.dp)
+                )
                 Text(
-                    card.countOfRepeating.toString(), style = TextStyle(
+                    card.repeatingCount.toString(), style = TextStyle(
                         fontSize = 20.sp,
                         fontFamily = nunitoVariableFont,
-                        color = AppCardItemBackgroundColor
+                        color = AppContentColor
                     )
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(8.dp)
                 )
                 Icon(
                     imageVector = Icons.Default.Clear,
@@ -562,7 +557,7 @@ private fun CardItemView(card: Card, onFlip: () -> Unit, onDelete: () -> Unit) {
                     tint = AppContentColor,
                     modifier = Modifier.clickable() {
                         onDelete()
-                    }
+                    }.size(25.dp)
                 )
             }
         }

@@ -5,7 +5,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.echolex.ui.theme.AppContentAltColor
+import com.example.echolex.ui.theme.AppContentBlackColor
 import com.example.echolex.ui.theme.AppContentColor
 
 @Composable
@@ -16,7 +16,7 @@ fun AppCheckbox(
     enabled: Boolean = true,
     colorChecked: Color = AppContentColor,
     colorUnchecked: Color = AppContentColor,
-    colorCheckmark: Color = AppContentAltColor,
+    colorCheckmark: Color = AppContentBlackColor,
 ) {
     Checkbox(
         checked = checked,
@@ -26,7 +26,8 @@ fun AppCheckbox(
         colors = CheckboxDefaults.colors(
             checkedColor = colorChecked,
             uncheckedColor = colorUnchecked,
-            checkmarkColor = colorCheckmark
+            checkmarkColor = colorCheckmark,
+
         )
     )
 }

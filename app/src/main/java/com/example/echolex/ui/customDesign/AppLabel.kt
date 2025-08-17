@@ -9,16 +9,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.echolex.ui.theme.AppContentAltColor
 import com.example.echolex.ui.theme.AppContentColor
 import com.example.echolex.ui.theme.nunitoVariableFont
 
 @Composable
-private fun AppLabel(
+fun AppLabel(
     text: String,
     modifier: Modifier = Modifier,
     startPadding: Int = 20,
-    textColor: Color = AppContentAltColor
+    textColor: Color = AppContentColor
 ) {
     Text(
         text = text,
@@ -30,13 +29,4 @@ private fun AppLabel(
         ),
         modifier = modifier.padding(start = startPadding.dp)
     )
-}
-
-@Composable
-fun AppStandardLabel(text: String, modifier: Modifier = Modifier, startPadding: Int = 20) {
-    AppLabel(text = text, modifier = modifier, startPadding = startPadding, textColor = AppContentColor)
-}
-@Composable
-fun AppAltLabel(text: String, modifier: Modifier = Modifier, startPadding: Int = 20) {
-    AppLabel(text = text, modifier = modifier, startPadding = startPadding, textColor = AppContentAltColor)
 }

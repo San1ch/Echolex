@@ -1,4 +1,4 @@
-package com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog
+package com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -30,8 +30,8 @@ import com.example.echolex.ui.customDesign.AppOutlinedTextField
 import com.example.echolex.ui.customDesign.AppStandardDialogBackground
 import com.example.echolex.ui.customDesign.AppStandardLabel
 import com.example.echolex.ui.customDesign.DualButtonRow
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.item.StageCreatingButton
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.item.StageItemCreating
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.item.StageCreatingButton
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.item.StageItemCreating
 import com.example.echolex.ui.theme.AppContentColor
 import com.example.echolex.ui.theme.nunitoVariableFont
 

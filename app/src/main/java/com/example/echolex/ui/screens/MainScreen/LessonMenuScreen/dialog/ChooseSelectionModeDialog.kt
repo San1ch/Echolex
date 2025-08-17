@@ -1,4 +1,4 @@
-package com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog
+package com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,7 +27,7 @@ import com.example.echolex.ui.theme.nunitoVariableFont
 @Composable
 fun ChooseSelectionModeDialog(viewModel: LessonMenuViewModel) {
     AppStandardDialogBackground(onOverlayClick = {
-        viewModel.dialogCenter.openCurrentCreatingStageDialog()
+        viewModel.dialogCenter.openCreateBlueprintStageDialog()
     }) {
         val buttonSpacing = 10.dp
 

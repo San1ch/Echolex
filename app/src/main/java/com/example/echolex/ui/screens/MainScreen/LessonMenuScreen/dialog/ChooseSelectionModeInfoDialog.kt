@@ -1,4 +1,4 @@
-package com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog
+package com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.echolex.R
 import com.example.echolex.core.domain.data.model.lesson.CardSelectionMode
-import com.example.echolex.core.domain.data.model.lesson.RepeatingStage
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuViewModel
 import com.example.echolex.ui.customDesign.AppStandardDialogBackground
 import com.example.echolex.ui.theme.AppContentColor
@@ -23,9 +22,9 @@ import com.example.echolex.ui.theme.nunitoVariableFont
 @Composable
 fun ChooseSelectionModeInfoDialog(viewModel: LessonMenuViewModel) {
     AppStandardDialogBackground(onOverlayClick = {
-        viewModel.dialogCenter.openCurrentCreatingStageDialog()
+        viewModel.dialogCenter.openCreateBlueprintStageDialog()
     }) {
-        val currentStage = viewModel.uiState.value.currentCreatingStage as RepeatingStage
+        val currentStage = viewModel.uiState.value.currentCreatingStage
         val currentMode = currentStage.cardSelectionMode
         val text = when (currentMode) {
             CardSelectionMode.RANDOM -> {
@@ -42,6 +41,9 @@ fun ChooseSelectionModeInfoDialog(viewModel: LessonMenuViewModel) {
 
             CardSelectionMode.LOCK_TO_PRIORITY -> {
                 stringResource(R.string.lock_to_priority_mode_info)
+            }
+            else -> {
+                stringResource(R.string.random_mode_info)
             }
         }
         ChooseSelectionModeInfoDialogContent(viewModel, text)

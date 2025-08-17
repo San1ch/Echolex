@@ -13,7 +13,7 @@ val Pink40 = Color(0xFF7D5260)
 
 // Custom Colors
 private val StandardWhiteColor = Color.White
-private val StandardHighLightRedColor = Color(0xFFffe1e1)
+private val StandardExtraLightColor = Color(0xFFF4D7D7)
 private val StandardRedColor = Color(0xFFc93a39)
 private val StandardBlackRedColor = Color(0xFF9C3232)
 private val StandardBlueColor = Color(0xFF3a39c9)
@@ -25,34 +25,32 @@ private val StandardCyanColor = Color(0xFF06b6d4)
 private val StandardPurpleColor = Color(0xFF9333ea)
 private val StandardBrownColor = Color(0xFF7b341e)
 private val StandardGreyColor = Color(0xFF6b7280)
+private val StandardLightGreyColor = Color(0xFFD1D1D1)
 
-private val StandardBlackColor = Color(0xFF202020)
+private val StandardBlackColor = Color(0xFF1e1f22)
+private val StandardDarkBlackColor = Color(0xFF101010)
+private val StandardLightBlackColor = Color(0xFF2b2d30)
+
 private val BlackTransparencyColor = Color.Black.copy(alpha = 0.2f)
 
 // Program Target Colors
 val AppTransparencyColor = BlackTransparencyColor
-val AppContentColor = StandardRedColor
-val AppContentAltColor = StandardWhiteColor
-
-val AppButtonBackgroundColor = StandardWhiteColor
-val AppButtonBorderColor = StandardRedColor
-val AppButtonContentColor = StandardRedColor
-
-val AppCardItemBackgroundColor = StandardWhiteColor
-val AppCardItemBorderColor = StandardRedColor
-val AppCardItemContentColor = StandardRedColor
-
+val AppContentColor = StandardExtraLightColor
 val AppContentBlackColor = StandardBlackColor
 
-val AppBlackGradientColor = StandardBlackRedColor
-val AppLightGradientColor = StandardRedColor
+val AppButtonBackgroundColor = StandardLightBlackColor
+val AppButtonBorderColor = StandardExtraLightColor
+val AppButtonContentColor = StandardExtraLightColor
 
-// CardStatusColor
+val AppStandardBackgroundColor = StandardDarkBlackColor
+
+
+// Card Status Color
 val AppCardItemPreLearnedStatusColor = StandardBlueColor
 val AppCardItemLearnedStatusColor = StandardGreenColor
 val AppCardItemNotLearnedStatusColor = StandardRedColor
 
-// TestColor
+// Test Colors
 val TestRedColor = StandardRedColor
 val TestBlueColor = StandardBlueColor
 val TestOrangeColor = StandardOrangeColor

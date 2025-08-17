@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 data class Card(
     val firstWord: String,
     val secondWord: String,
-    val countOfRepeating: Int = 0,
-    val isPreLearnedCard: Boolean = false
+    val repeatingCount: Int = 0,
+    val isPreLearned: Boolean = false
 ) {
     fun flipCard(): Card {
         return copy(firstWord = secondWord, secondWord = firstWord)

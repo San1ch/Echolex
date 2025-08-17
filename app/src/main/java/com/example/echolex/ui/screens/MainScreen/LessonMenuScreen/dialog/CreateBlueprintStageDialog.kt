@@ -1,4 +1,4 @@
-package com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog
+package com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -33,8 +33,7 @@ import com.example.echolex.core.constants.MIN_COUNT_OF_CORRECT_CYCLES_FOR_LEARNI
 import com.example.echolex.core.constants.MIN_COUNT_OF_CORRECT_CYCLES_FOR_REPEATING
 import com.example.echolex.core.constants.MIN_COUNT_REPEATING_PRIORITY
 import com.example.echolex.core.domain.data.model.lesson.CardSelectionMode
-import com.example.echolex.core.domain.data.model.lesson.LearningStage
-import com.example.echolex.core.domain.data.model.lesson.RepeatingStage
+import com.example.echolex.core.domain.data.model.lesson.StageType
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuViewModel
 import com.example.echolex.ui.customDesign.AppBorderButton
 import com.example.echolex.ui.customDesign.AppSliderLabelCount
@@ -47,12 +46,12 @@ import com.example.echolex.ui.theme.nunitoVariableFont
 @Composable
 fun CreateBlueprintStageDialog(viewModel: LessonMenuViewModel) {
     AppStandardDialogBackground {
-        when (viewModel.uiState.value.currentCreatingStage) {
-            is RepeatingStage -> {
+        when (viewModel.uiState.value.currentCreatingStage.type) {
+            StageType.REPEATING -> {
                 CreateBlueprintRepeatStage(viewModel)
             }
 
-            is LearningStage -> {
+            StageType.LEARNING -> {
                 CreateBlueprintLearnStage(viewModel)
             }
         }
@@ -61,7 +60,7 @@ fun CreateBlueprintStageDialog(viewModel: LessonMenuViewModel) {
 
 @Composable
 private fun CreateBlueprintRepeatStage(viewModel: LessonMenuViewModel) {
-    val stage = viewModel.uiState.value.currentCreatingStage as RepeatingStage
+    val stage = viewModel.uiState.value.currentCreatingStage
 
     Column(
         modifier = Modifier
@@ -80,16 +79,16 @@ private fun CreateBlueprintRepeatStage(viewModel: LessonMenuViewModel) {
             cycles = stage.cycles.toFloat(),
             onCardsChange = { viewModel.updateStageCardsValue(it.toInt()) },
             onCyclesChange = { viewModel.updateCyclesValue(it.toInt()) },
-            minCards = MIN_COUNT_OF_CARDS_FOR_LEARNING,
-            maxCards = MAX_COUNT_OF_CARDS_FOR_LEARNING,
-            minCycles = MIN_COUNT_OF_CORRECT_CYCLES_FOR_LEARNING,
-            maxCycles = MAX_COUNT_OF_CORRECT_CYCLES_FOR_LEARNING,
+            minCards = MIN_COUNT_OF_CARDS_FOR_REPEATING,
+            maxCards = MAX_COUNT_OF_CARDS_FOR_REPEATING,
+            minCycles = MIN_COUNT_OF_CORRECT_CYCLES_FOR_REPEATING,
+            maxCycles = MAX_COUNT_OF_CORRECT_CYCLES_FOR_REPEATING,
         )
 
         if(stage.cardSelectionMode != CardSelectionMode.RANDOM) {
             AppSliderLabelCount(
                 text = stringResource(R.string.priority) + ": ",
-                value = stage.basePriorityRepeatingLevel.toFloat(),
+                value = stage.priority.toFloat(),
                 onValueChange = { viewModel.updatePriorityLevel(it.toInt()) },
                 min = MIN_COUNT_REPEATING_PRIORITY.toFloat(),
                 max = MAX_COUNT_REPEATING_PRIORITY.toFloat(),
@@ -121,13 +120,13 @@ private fun CreateBlueprintRepeatStage(viewModel: LessonMenuViewModel) {
             leftButtonText = stringResource(R.string.back),
             rightButtonText = stringResource(R.string.create),
             onLeftClick = { viewModel.dialogCenter.openChooseStageModeDialog() },
-            onRightClick = { viewModel.createAndAddStage(stage = stage) })
+            onRightClick = { viewModel.createAndAddStage() })
     }
 }
 
 @Composable
 private fun CreateBlueprintLearnStage(viewModel: LessonMenuViewModel) {
-    val stage = viewModel.uiState.value.currentCreatingStage as LearningStage
+    val stage = viewModel.uiState.value.currentCreatingStage
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -153,17 +152,17 @@ private fun CreateBlueprintLearnStage(viewModel: LessonMenuViewModel) {
             cycles = stage.cycles.toFloat(),
             onCardsChange = { viewModel.updateStageCardsValue(it.toInt()) },
             onCyclesChange = { viewModel.updateCyclesValue(it.toInt()) },
-            minCards = MIN_COUNT_OF_CARDS_FOR_REPEATING,
-            maxCards = MAX_COUNT_OF_CARDS_FOR_REPEATING,
-            minCycles = MIN_COUNT_OF_CORRECT_CYCLES_FOR_REPEATING,
-            maxCycles = MAX_COUNT_OF_CORRECT_CYCLES_FOR_REPEATING,
+            minCards = MIN_COUNT_OF_CARDS_FOR_LEARNING,
+            maxCards = MAX_COUNT_OF_CARDS_FOR_LEARNING,
+            minCycles = MIN_COUNT_OF_CORRECT_CYCLES_FOR_LEARNING,
+            maxCycles = MIN_COUNT_OF_CORRECT_CYCLES_FOR_LEARNING,
         )
 
         DualButtonRow(
             leftButtonText = stringResource(R.string.back),
             rightButtonText = stringResource(R.string.create),
             onLeftClick = { viewModel.dialogCenter.openChooseStageModeDialog() },
-            onRightClick = { viewModel.createAndAddStage(stage = stage) })
+            onRightClick = { viewModel.createAndAddStage() })
     }
 }
 

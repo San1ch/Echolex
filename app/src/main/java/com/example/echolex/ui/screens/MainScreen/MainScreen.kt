@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -57,7 +56,7 @@ fun MainMenuScreenContent(viewModel: MainMenuViewModel) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         AppButton(
-                            stringResource(R.string.start), modifier = Modifier
+                            stringResource(R.string.lesson), modifier = Modifier
                                 .weight(1f)
                                 .padding(5.dp, 0.dp), onClick = {
                             viewModel.openLessonMenu()
@@ -71,6 +70,16 @@ fun MainMenuScreenContent(viewModel: MainMenuViewModel) {
                     }
                     Spacer(modifier = Modifier
                         .height(20.dp))
+                    
+                    AppButton(
+                        text = "Очистити всі дані",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                        onClick = {
+                            viewModel.clearAllData()
+                        }
+                    )
                 }
             }
         }

@@ -15,6 +15,12 @@ class SharedDataMemoryStore @Inject constructor(){
             deckNameForItemDeckInfo = name
         )
     }
+    
+    suspend fun setCurrentLessonName(name: String) {
+        state.value = state.value.copy(
+            currentLessonName = name
+        )
+    }
 
     fun getState(): StateFlow<SharedDataMemoryStoreState> {
         return state.asStateFlow()
@@ -22,6 +28,6 @@ class SharedDataMemoryStore @Inject constructor(){
 }
 
 data class SharedDataMemoryStoreState(
-    val deckNameForItemDeckInfo: String = ""
-
+    val deckNameForItemDeckInfo: String = "",
+    val currentLessonName: String = ""
 )

@@ -35,7 +35,7 @@ class DeckImportCreator @Inject constructor(
                         Card(
                             firstWord = word,
                             secondWord = translation,
-                            isPreLearnedCard = data.isPreLearned
+                            isPreLearned = data.isPreLearned
                         )
                     } else null
                 } else null

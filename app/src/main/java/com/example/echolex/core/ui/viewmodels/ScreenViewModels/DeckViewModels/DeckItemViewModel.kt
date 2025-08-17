@@ -112,8 +112,11 @@ class DeckItemViewModel @Inject constructor(
 
     fun deleteCard() {
         viewModelScope.launch {
-            removeCardInDeckUseCase(screenDeck.value.name, currentCardToRemove)
-            copyToLocal()
+            val card = currentCardToRemove
+            if (card != null){
+                removeCardInDeckUseCase(screenDeck.value.name, card)
+                copyToLocal()
+            }
         }
         closeDialogMode()
     }

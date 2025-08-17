@@ -16,10 +16,10 @@ class GetDecksCopyStatUseCase @Inject constructor(
 
             decks.map {
                 it.cards.map {
-                    if (!it.isPreLearnedCard) {
+                    if (!it.isPreLearned) {
                         result.countOfNotLearnedCards++
                     } else {
-                        if (it.countOfRepeating >= COUNT_OF_REPETITION_TO_LEARN) {
+                        if (it.repeatingCount >= COUNT_OF_REPETITION_TO_LEARN) {
                             result.countOfLearnedCards++
                         } else {
                             result.countOfPreLearnedCards++

@@ -12,7 +12,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.echolex.ui.theme.AppContentAltColor
+import com.example.echolex.ui.theme.AppContentBlackColor
 import com.example.echolex.ui.theme.AppContentColor
 import com.example.echolex.ui.theme.nunitoVariableFont
 
@@ -25,11 +25,11 @@ fun LabeledCheckbox(
     enabled: Boolean = true,
     colorChecked: Color = AppContentColor,
     colorUnchecked: Color = AppContentColor,
-    colorCheckmark: Color = AppContentAltColor,
+    colorCheckmark: Color = AppContentBlackColor,
     textStyle: TextStyle = TextStyle(
         fontSize = 15.sp,
         fontFamily = nunitoVariableFont,
-        color = AppContentAltColor
+        color = AppContentColor
     ),
     spacing: Dp = 5.dp,
     checkboxModifier: Modifier = Modifier

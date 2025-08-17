@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.echolex.R
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels.DeckImportViewModel
-import com.example.echolex.ui.customDesign.AppAltLabel
 import com.example.echolex.ui.customDesign.AppButton
+import com.example.echolex.ui.customDesign.AppLabel
 import com.example.echolex.ui.customDesign.AppMultiLineOutlinedTextField
 import com.example.echolex.ui.customDesign.AppOutlinedTextField
 import com.example.echolex.ui.customDesign.LabeledCheckbox
@@ -87,7 +87,7 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
                     ) {
                         // Deck Name Label
 
-                        AppAltLabel(
+                        AppLabel(
                             text = stringResource(R.string.deck_name),
                         )
 
@@ -104,7 +104,7 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
                                 .height(10.dp)
                         )
                         // Import Input Label
-                        AppAltLabel(
+                        AppLabel(
                             text = stringResource(R.string.import_input),
                         )
 

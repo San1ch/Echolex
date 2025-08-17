@@ -9,3 +9,4 @@ const val DeckImportScreenRoute = "DeckImportScreen"
 const val LessonSettingsMenuScreenRoute = "LessonSettingsMenuScreen"
 //Lesson Screens
 const val LessonMenuScreenRoute = "LessonMenuScreen"
+const val LessonProcessScreenRoute = "LessonProcessScreen"

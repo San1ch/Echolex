@@ -50,8 +50,6 @@ import com.example.echolex.ui.customDesign.AppOutlinedTextField
 import com.example.echolex.ui.customDesign.StandardStart
 import com.example.echolex.ui.theme.AppButtonBackgroundColor
 import com.example.echolex.ui.theme.AppButtonContentColor
-import com.example.echolex.ui.theme.AppContentBlackColor
-import com.example.echolex.ui.theme.AppContentColor
 import com.example.echolex.ui.theme.nunitoVariableFont
 
 @Composable
@@ -93,7 +91,7 @@ fun DecksScreenContent(viewModel: DecksMenuViewModel) {
                                 stringResource(R.string.deck_count), style = TextStyle(
                                     fontSize = 20.sp,
                                     fontFamily = nunitoVariableFont,
-                                    color = AppContentColor,
+                                    color = AppButtonContentColor,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
@@ -101,7 +99,7 @@ fun DecksScreenContent(viewModel: DecksMenuViewModel) {
                                 decks.size.toString(), style = TextStyle(
                                     fontSize = 20.sp,
                                     fontFamily = nunitoVariableFont,
-                                    color = AppContentColor,
+                                    color = AppButtonContentColor,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
@@ -199,7 +197,7 @@ fun ItemDeckBoard(
                     bottomEnd = 5.dp
                 )
             )
-            .background(Color.White)
+            .background(AppButtonBackgroundColor)
             .height(100.dp)
             .fillMaxWidth()
             .clickable { viewModel.navigateDeckInfoScreen(nameOfDeck) }
@@ -219,7 +217,7 @@ fun ItemDeckBoard(
                     style = TextStyle(
                         fontSize = 20.sp,
                         fontFamily = nunitoVariableFont,
-                        color = AppContentBlackColor,
+                        color = AppButtonContentColor,
                         fontWeight = FontWeight.Bold
                     )
                 )
@@ -257,7 +255,7 @@ fun InfoRow(label: String, value: String, fontSize: TextUnit) {
             style = TextStyle(
                 fontSize = fontSize,
                 fontFamily = nunitoVariableFont,
-                color = AppContentBlackColor,
+                color = AppButtonContentColor,
                 fontWeight = FontWeight.Medium
             )
         )
@@ -266,7 +264,7 @@ fun InfoRow(label: String, value: String, fontSize: TextUnit) {
             style = TextStyle(
                 fontSize = fontSize,
                 fontFamily = nunitoVariableFont,
-                color = AppContentBlackColor,
+                color = AppButtonContentColor,
                 fontWeight = FontWeight.Medium
             )
         )

@@ -1,4 +1,4 @@
-package com.example.echolex.core.domain.useCase.validation
+package com.example.echolex.core.domain.useCase.deck
 
 import com.example.echolex.core.domain.data.model.notification.AppNotification
 import com.example.echolex.core.domain.validation.newValdations.textValidation.ContainsDigitsRule

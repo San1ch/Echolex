@@ -24,10 +24,12 @@ import com.example.echolex.ui.screens.DeckImportScreenRoute
 import com.example.echolex.ui.screens.DeckItemScreenRoute
 import com.example.echolex.ui.screens.DecksMenuScreenRoute
 import com.example.echolex.ui.screens.LessonMenuScreenRoute
+import com.example.echolex.ui.screens.LessonProcessScreenRoute
 import com.example.echolex.ui.screens.MainScreen.DeckMenuScreen.DeckImportScreen.DeckImportScreen
 import com.example.echolex.ui.screens.MainScreen.DeckMenuScreen.DeckItemScreen.DeckItemScreen
 import com.example.echolex.ui.screens.MainScreen.DeckMenuScreen.DecksScreen
-import com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.LessonScreen
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.LearningScreen
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.LessonScreen
 import com.example.echolex.ui.screens.MainScreen.MainScreen
 import com.example.echolex.ui.screens.MainScreenRoute
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,6 +71,7 @@ fun CenterProgramScreen(viewModel: CenterProgramViewModel = hiltViewModel()) {
         composable(DeckItemScreenRoute) { DeckItemScreen() }
         composable(DeckImportScreenRoute) { DeckImportScreen() }
         composable(LessonMenuScreenRoute) { LessonScreen() }
+        composable(LessonProcessScreenRoute) { LearningScreen() }
     }
 
     CenterProgramNotification(viewModel)

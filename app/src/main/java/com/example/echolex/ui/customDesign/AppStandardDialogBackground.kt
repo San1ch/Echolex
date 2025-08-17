@@ -40,7 +40,6 @@ fun AppStandardDialogBackground(
             modifier = Modifier
                 .wrapContentSize()
                 .padding(20.dp)
-                .border(3.dp, AppContentColor, RoundedCornerShape(10.dp))
                 .clip(RoundedCornerShape(10.dp))
                 .background(AppButtonBackgroundColor)
                 .then(

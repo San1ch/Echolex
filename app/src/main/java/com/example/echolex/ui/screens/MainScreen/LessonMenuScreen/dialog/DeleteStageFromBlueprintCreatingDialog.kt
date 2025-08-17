@@ -1,4 +1,4 @@
-package com.example.echolex.ui.screens.MainScreen.LessonSettingsScreen.dialog
+package com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +30,7 @@ fun DeleteStageInCreateDialog(viewModel: LessonMenuViewModel) {
         leftButtonText = stringResource(R.string.no),
         rightButtonText = stringResource(R.string.yes),
         onLeftClick = {
-            viewModel.dialogCenter.openCreateBlueprintDialog()
+            viewModel.dialogCenter.closeDialog()
         },
         onRightClick = {
             viewModel.deleteStage()

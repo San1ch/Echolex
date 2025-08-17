@@ -63,10 +63,18 @@
     <string name="cycles">Cycles</string>
     <string name="do_you_want_to_delete_the_stage">Do you want to delete the stage?</string>
     <string name="add_stage">Add stage</string>
-    <string name="start">Start</string>
+    <string name="lesson">Lesson</string>
     <string name="decks">Decks</string>
     <string name="prefer_low_priority_mode_info">When you choose this mode, you will prefer cards with lower count of repetitions what depend of your chosen priority level.</string>
     <string name="random_mode_info">Chose a random cards from all decks. No matter priority level, repetition count or learning status.</string>
     <string name="prefer_high_priority_mode_info">When you choose this mode, you will prefer cards with higher count of repetitions what depend of your chosen priority level.</string>
     <string name="lock_to_priority_mode_info">If you choose this mode, you will learn only cards with your chosen priority level.</string>
+    <string name="delete">Delete</string>
+    <string name="delete_blueprint_question">Delete blueprint?</string>
+    <string name="choose_all">Choose all</string>
+    <string name="create_lesson">Create lesson</string>
+    <string name="delete_lesson">Delete lesson?</string>
+    <string name="start">Start</string>
+    <string name="create_blueprint">Create blueprint</string>
+    <string name="enter_blueprint_name">Enter blueprint name</string>
 </resources>
