@@ -2,12 +2,15 @@ package com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.item
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +27,12 @@ import com.example.echolex.ui.theme.nunitoVariableFont
 
 
 @Composable
-fun DeckItemInLessonCreating(deckName: String, countOfCards: String, isChecked: Boolean,  onCheckedChange: (Boolean) -> Unit) {
+fun DeckItemInLessonCreating(
+    deckName: String,
+    countOfCards: String,
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     val cornerAndBorder = 5
     Box(
         modifier = Modifier
@@ -37,19 +45,28 @@ fun DeckItemInLessonCreating(deckName: String, countOfCards: String, isChecked: 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically
+                .wrapContentHeight()
+                .padding(end = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            AppCheckbox(
-                checked = isChecked,
-                onCheckedChange = onCheckedChange,
-            )
-            Text(
-                deckName, style = TextStyle(
-                    fontSize = 20.sp,
-                    fontFamily = nunitoVariableFont,
-                    color = AppContentColor
+            Row(
+                modifier = Modifier.wrapContentSize(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AppCheckbox(
+                    checked = isChecked,
+                    onCheckedChange = onCheckedChange,
                 )
-            )
+                Text(
+                    deckName, style = TextStyle(
+                        fontSize = 20.sp,
+                        fontFamily = nunitoVariableFont,
+                        color = AppContentColor
+                    )
+                )
+            }
 
             Text(
                 countOfCards, style = TextStyle(

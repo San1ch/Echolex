@@ -1,10 +1,10 @@
 package com.example.echolex.core.domain.useCase.lesson
 
-import com.example.echolex.core.domain.data.repository.LessonMemoryStore
+import com.example.echolex.core.domain.data.repository.LessonRepository
 import javax.inject.Inject
 
 class GetFlowLessonListUseCase @Inject constructor(
-    private val lessonMemoryStore: LessonMemoryStore
+    private val lessonRepository: LessonRepository
 ) {
-    operator fun invoke() = lessonMemoryStore.lessons
+    operator fun invoke() = lessonRepository.lessons
 }

@@ -38,6 +38,4 @@ data class DeckCardsLearningStatus(
     val countLearnedCard: String,
     val countPreLearnedCard: String,
     val countNotLearnedCard: String
-) {
-
-}
+)

@@ -24,11 +24,15 @@ import com.example.echolex.core.domain.useCase.screensUseCases.NavigateToScreenU
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
 import com.example.echolex.core.navigation.NavigationTarget
 import com.example.echolex.core.ui.dialog.LessonMenuDialogCenter
-import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuDialogState
-import com.example.echolex.core.domain.useCase.lesson.SetCurrentLessonUseCase
 import androidx.lifecycle.viewModelScope
+import com.example.echolex.core.domain.useCase.lesson.SetCurrentLessonUseCase
+import com.example.echolex.core.ui.dialog.LessonMenuDialogState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 
 @HiltViewModel
 class LessonMenuViewModel @Inject constructor(
@@ -70,33 +74,39 @@ class LessonMenuViewModel @Inject constructor(
     fun openCreatingLessonDialog() {
         viewModelScope.launch {
             val blueprints = blueprintList.first()
-            if (blueprints.isEmpty()) {
-                openAppNotificationUseCase(AppNotification.Business.BlueprintsDoNotExist)
-            } else {
-                dialogCenter.createLessonDialog()
+            val decks = deckList.first()
+
+            when {
+                blueprints.isEmpty() -> openAppNotificationUseCase(AppNotification.Business.BlueprintsDoNotExist)
+                decks.isEmpty() -> openAppNotificationUseCase(AppNotification.Business.DecksDoNotExist)
+                else -> dialogCenter.createLessonDialog()
             }
         }
     }
 
-    fun createLesson(blueprint: LessonBlueprint, decks: List<Deck>) {
-        if (uiState.value.lessonNameTextField.isBlank()) {
-            openAppNotificationUseCase(AppNotification.Validation.NameIsEmpty)
-            return
-        }
-        if (decks.isEmpty()) {
-            openAppNotificationUseCase(AppNotification.Business.LessonDecksAreEmpty)
-            return
-        }
-        
-        val chosenDeckNames = decks.map { it.name }
-        val result =
-            createLessonUseCase(blueprint, chosenDeckNames, uiState.value.lessonNameTextField)
-        if (result) {
-            dialogCenter.closeDialog()
-            updateUiState {
-                it.copy(
-                    lessonNameTextField = ""
-                )
+
+
+    fun createLesson(lessonBlueprint: LessonBlueprint, decks: List<Deck>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (uiState.value.lessonNameTextField.isBlank()) {
+                openAppNotificationUseCase(AppNotification.Validation.NameIsEmpty)
+                return@launch
+            }
+            if (decks.isEmpty()) {
+                openAppNotificationUseCase(AppNotification.Business.LessonDecksAreEmpty)
+                return@launch
+            }
+
+            val chosenDeckNames = decks.map { it.name }
+            val result =
+                createLessonUseCase(lessonBlueprint, chosenDeckNames, uiState.value.lessonNameTextField)
+            if (result) {
+                dialogCenter.closeDialog()
+                updateUiState {
+                    it.copy(
+                        lessonNameTextField = ""
+                    )
+                }
             }
         }
     }
@@ -154,50 +164,57 @@ class LessonMenuViewModel @Inject constructor(
     }
 
     fun createBlueprint() {
-        val blueprint = uiState.value.currentCreatingBlueprint
-        if (blueprint.name.isBlank()) {
-            openAppNotificationUseCase(AppNotification.Validation.NameIsEmpty)
-            return
-        }
-        if (blueprint.stages.isEmpty()) {
-            openAppNotificationUseCase(AppNotification.Business.BlueprintsStagesAreEmpty)
-            return
-        }
-        
-        if (createBlueprintUseCase(blueprint)) {
-            updateUiState {
-                it.copy(
-                    currentCreatingBlueprint = LessonBlueprint(
-                        name = "",
-                        stages = listOf(),
-                        settings = LessonSettings()
+        viewModelScope.launch {
+            val blueprint = uiState.value.currentCreatingLessonBlueprint
+            if (blueprint.name.isBlank()) {
+                openAppNotificationUseCase(AppNotification.Validation.NameIsEmpty)
+                return@launch
+            }
+            if (blueprint.stages.isEmpty()) {
+                openAppNotificationUseCase(AppNotification.Business.BlueprintsStagesAreEmpty)
+                return@launch
+            }
+
+            if (createBlueprintUseCase(blueprint)) {
+                updateUiState {
+                    it.copy(
+                        currentCreatingLessonBlueprint = LessonBlueprint(
+                            name = "",
+                            stages = emptyList(),
+                            settings = LessonSettings()
+                        )
                     )
-                )
+                }
+                dialogCenter.closeDialog()
+            }
+        }
+    }
+
+    fun deleteBlueprint() {
+        viewModelScope.launch{
+
+            val blueprint = uiState.value.currentLessonBlueprintToDelete
+            if (blueprint == null) {
+                openAppNotificationUseCase(AppNotification.Business.BlueprintsDoNotExist)
+            } else {
+                deleteBlueprintFromStoreUseCase(blueprint.name)
             }
             dialogCenter.closeDialog()
         }
     }
 
-    fun deleteBlueprint() {
-        val blueprint = uiState.value.currentBlueprintToDelete
-        if (blueprint == null) {
-            openAppNotificationUseCase(AppNotification.Business.BlueprintsDoNotExist)
-        } else {
-            deleteBlueprintFromStoreUseCase(blueprint.name)
-        }
-        dialogCenter.closeDialog()
-    }
-
     fun createStage() {
         updateUiState {
             it.copy(
-                currentCreatingBlueprint = uiState.value.currentCreatingBlueprint.copy(
-                    stages = uiState.value.currentCreatingBlueprint.stages + uiState.value.currentCreatingStage
+                currentCreatingLessonBlueprint = uiState.value.currentCreatingLessonBlueprint.copy(
+                    stages = uiState.value.currentCreatingLessonBlueprint.stages + uiState.value.currentCreatingStage
                 ),
                 currentCreatingStage = LessonStage(
                     type = StageType.LEARNING,
                     cards = 10,
-                    cycles = 5
+                    cycles = 5,
+                    priority = 1,
+                    cardSelectionMode = CardSelectionMode.Random
                 )
             )
         }
@@ -225,13 +242,15 @@ class LessonMenuViewModel @Inject constructor(
     }
 
     fun deleteLesson() {
-        val lesson = uiState.value.currentLessonToDelete
-        if (lesson == null) {
-            openAppNotificationUseCase(AppNotification.Business.LessonDoesNotExist)
-        } else {
-            deleteLessonFromStoreUseCase(lesson)
+        viewModelScope.launch {
+            val lesson = uiState.value.currentLessonToDelete
+            if (lesson == null) {
+                openAppNotificationUseCase(AppNotification.Business.LessonDoesNotExist)
+            } else {
+                deleteLessonFromStoreUseCase(lesson)
+            }
+            dialogCenter.closeDialog()
         }
-        dialogCenter.closeDialog()
     }
 
     fun openLearningScreen(lesson: Lesson) {
@@ -245,7 +264,7 @@ class LessonMenuViewModel @Inject constructor(
     fun updateBlueprintName(name: String) {
         updateUiState {
             it.copy(
-                currentCreatingBlueprint = uiState.value.currentCreatingBlueprint.copy(
+                currentCreatingLessonBlueprint = uiState.value.currentCreatingLessonBlueprint.copy(
                     name = name
                 )
             )
@@ -256,7 +275,7 @@ class LessonMenuViewModel @Inject constructor(
         name: String? = null,
         isLoop: Boolean? = null
     ) {
-        val current = uiState.value.currentCreatingBlueprint
+        val current = uiState.value.currentCreatingLessonBlueprint
         val newSettings = current.settings.copy(
             isLoop = isLoop ?: current.settings.isLoop
         )
@@ -266,7 +285,7 @@ class LessonMenuViewModel @Inject constructor(
         )
         updateUiState {
             it.copy(
-                currentCreatingBlueprint = updated
+                currentCreatingLessonBlueprint = updated
             )
         }
     }
@@ -285,8 +304,8 @@ class LessonMenuViewModel @Inject constructor(
         if (stageToDelete != null) {
             updateUiState {
                 it.copy(
-                    currentCreatingBlueprint = uiState.value.currentCreatingBlueprint.copy(
-                        stages = uiState.value.currentCreatingBlueprint.stages.filter { stage ->
+                    currentCreatingLessonBlueprint = uiState.value.currentCreatingLessonBlueprint.copy(
+                        stages = uiState.value.currentCreatingLessonBlueprint.stages.filter { stage ->
                             stage != stageToDelete
                         }
                     ),
@@ -308,7 +327,8 @@ class LessonMenuViewModel @Inject constructor(
                 type = StageType.REPEATING,
                 cards = 10,
                 cycles = 5,
-                priority = 0
+                priority = 0,
+                cardSelectionMode = _uiState.value.currentCreatingStage.cardSelectionMode
             )
         }
         
@@ -331,8 +351,8 @@ class LessonMenuViewModel @Inject constructor(
         val currentStage = uiState.value.currentCreatingStage
         updateUiState {
             it.copy(
-                currentCreatingBlueprint = uiState.value.currentCreatingBlueprint.copy(
-                    stages = uiState.value.currentCreatingBlueprint.stages + currentStage
+                currentCreatingLessonBlueprint = uiState.value.currentCreatingLessonBlueprint.copy(
+                    stages = uiState.value.currentCreatingLessonBlueprint.stages + currentStage
                 ),
                 currentCreatingStage = LessonStage(
                     type = StageType.LEARNING,
@@ -344,10 +364,10 @@ class LessonMenuViewModel @Inject constructor(
         dialogCenter.createBlueprintDialog()
     }
 
-    fun openDeleteBlueprintDialog(blueprint: LessonBlueprint) {
+    fun openDeleteBlueprintDialog(lessonBlueprint: LessonBlueprint) {
         updateUiState {
             it.copy(
-                currentBlueprintToDelete = blueprint
+                currentLessonBlueprintToDelete = lessonBlueprint
             )
         }
         dialogCenter.deleteBlueprintDialog()
@@ -357,7 +377,7 @@ class LessonMenuViewModel @Inject constructor(
 data class LessonMenuUiState(
     val lessonMenuScreenUiState: LessonMenuScreenUiState = LessonMenuScreenUiState.Lessons,
     val lessonMenuDialogUiState: LessonMenuDialogState = LessonMenuDialogState.Closed,
-    val currentCreatingBlueprint: LessonBlueprint = LessonBlueprint(
+    val currentCreatingLessonBlueprint: LessonBlueprint = LessonBlueprint(
         name = "",
         stages = emptyList(),
         settings = LessonSettings()
@@ -369,7 +389,7 @@ data class LessonMenuUiState(
     ),
     val stageToDelete: LessonStage? = null,
 
-    val currentBlueprintToDelete: LessonBlueprint? = null,
+    val currentLessonBlueprintToDelete: LessonBlueprint? = null,
 
     val currentLessonToLearn: Lesson? = null,
     val currentLessonToDelete: Lesson? = null,

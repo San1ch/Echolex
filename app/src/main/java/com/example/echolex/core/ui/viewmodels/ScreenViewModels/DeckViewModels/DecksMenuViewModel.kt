@@ -2,6 +2,8 @@ package com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.echolex.core.constants.SharedDataDeckItemNameKey
+import com.example.echolex.core.constants.SharedDataLessonItemNameKey
 import com.example.echolex.core.domain.data.local.SetSharedDeckNameUseCase
 import com.example.echolex.core.domain.data.model.deck.Deck
 import com.example.echolex.core.domain.data.model.deck.DeckCardsLearningStatus
@@ -52,7 +54,7 @@ class DecksMenuViewModel @Inject constructor(
 
     fun navigateDeckInfoScreen(name: String) {
         viewModelScope.launch {
-            setSharedDeckNameUseCase(name)
+            setSharedDeckNameUseCase<String>(SharedDataDeckItemNameKey, name)
             navigateToScreenUseCase(DeckScreens.DeckItem)
         }
     }

@@ -3,7 +3,7 @@ package com.example.echolex.core.ui.viewmodels.ScreenViewModels.DeckViewModels
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.echolex.core.domain.data.local.GetSharedStateUseCase
+import com.example.echolex.core.domain.data.local.GetSharedDataUseCase
 import com.example.echolex.core.domain.data.model.deck.Card
 import com.example.echolex.core.domain.data.model.deck.Deck
 import com.example.echolex.core.domain.useCase.deck.AddCardsToDeckUseCase
@@ -18,12 +18,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.runtime.State
+import com.example.echolex.core.constants.SharedDataDeckItemNameKey
 import com.example.echolex.core.domain.data.model.notification.AppNotification
-import com.example.echolex.core.domain.data.repository.SharedDataMemoryStoreState
 import com.example.echolex.core.domain.service.DataDeck
 import com.example.echolex.core.domain.useCase.deck.GetCardExportStringUseCase
 import com.example.echolex.core.domain.useCase.screensUseCases.BackToPreviousScreenUseCase
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 
 @HiltViewModel
@@ -33,21 +34,20 @@ class DeckItemViewModel @Inject constructor(
     private val getDeckByNameUseCase: GetDeckByNameUseCase,
     private val removeCardInDeckUseCase: RemoveCardInDeckUseCase,
     private val addCardsToDeckUseCase: AddCardsToDeckUseCase,
-    private val getSharedStateUseCase: GetSharedStateUseCase,
+    private val getSharedDataUseCase: GetSharedDataUseCase,
     private val backToPreviousScreenUseCase: BackToPreviousScreenUseCase,
     private val getCardExportStringUseCase: GetCardExportStringUseCase,
     private val openAppNotificationUseCase: OpenAppNotificationUseCase
 ) : ViewModel() {
-    private val deckName: StateFlow<SharedDataMemoryStoreState> = getSharedStateUseCase()
-
+    val deckName: String = getSharedDataUseCase<String>(SharedDataDeckItemNameKey)!!
     val screenDeck: StateFlow<Deck> =
-        getDeckByNameUseCase(deckName.value.deckNameForItemDeckInfo).stateIn(
+        getDeckByNameUseCase(deckName).stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
             Deck("TEMP_TEST")
         )
 
-    private val _localDeck = mutableStateOf(Deck(name = deckName.value.deckNameForItemDeckInfo))
+    private val _localDeck = mutableStateOf(Deck(name = deckName))
     val localDeck: State<Deck> = _localDeck
 
 
@@ -104,14 +104,14 @@ class DeckItemViewModel @Inject constructor(
 
     fun deleteDeck() {
         closeDialogMode()
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             removeDeckUseCase(localDeck.value.name)
             backScreen()
         }
     }
 
     fun deleteCard() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val card = currentCardToRemove
             if (card != null){
                 removeCardInDeckUseCase(screenDeck.value.name, card)
@@ -154,7 +154,7 @@ class DeckItemViewModel @Inject constructor(
     fun changeDeckName() {
         val currentName = screenDeck.value.name
         val newName = changedNameTextField.value
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val changed = changeDeckNameUseCase(newName, currentName)
             if (changed) {
                 backToPreviousScreenUseCase()

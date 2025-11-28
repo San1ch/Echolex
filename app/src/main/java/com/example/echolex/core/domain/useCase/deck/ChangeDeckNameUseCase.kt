@@ -2,14 +2,14 @@ package com.example.echolex.core.domain.useCase.deck
 
 import com.example.echolex.core.domain.data.model.notification.AppNotification
 import com.example.echolex.core.domain.data.repository.DeckFindResult
-import com.example.echolex.core.domain.data.repository.DeckMemoryStore
+import com.example.echolex.core.domain.data.repository.DeckRepository
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
 import javax.inject.Inject
 
 class ChangeDeckNameUseCase @Inject constructor(
-   private val deckMemoryStore: DeckMemoryStore,
-   private val openAppNotificationUseCase: OpenAppNotificationUseCase,
-   private val validate: ValidateDeckNameUseCase
+    private val deckRepository: DeckRepository,
+    private val openAppNotificationUseCase: OpenAppNotificationUseCase,
+    private val validate: ValidateDeckNameUseCase
 ) {
     suspend operator fun invoke(newName: String, oldName: String): Boolean {
         if(newName == oldName){
@@ -17,7 +17,7 @@ class ChangeDeckNameUseCase @Inject constructor(
             return false
         }
 
-        val oldDeckResult = deckMemoryStore.getDeckByName(oldName)
+        val oldDeckResult = deckRepository.getDeckByName(oldName)
         when(oldDeckResult) {
             is DeckFindResult.NotFound -> {
                 openAppNotificationUseCase(AppNotification.Business.DeckDoesNotExist)
@@ -34,7 +34,7 @@ class ChangeDeckNameUseCase @Inject constructor(
 
                 val deckWithNewName = oldDeck.copy(name = newName)
 
-                deckMemoryStore.changeDeckName(oldName, deckWithNewName)
+                deckRepository.changeDeckName(oldName, deckWithNewName)
 
                 openAppNotificationUseCase(AppNotification.Null)
                 return true

@@ -1,12 +1,12 @@
 package com.example.echolex.core.domain.useCase.lesson
 
-import com.example.echolex.core.domain.data.repository.LessonMemoryStore
+import com.example.echolex.core.domain.data.repository.LessonRepository
 import javax.inject.Inject
 
 class CheckSimilarLessonUseCase @Inject constructor(
-    private val lessonMemoryStore: LessonMemoryStore
+    private val lessonRepository: LessonRepository
 ) {
-    operator fun invoke(name: String): Boolean {
-        return lessonMemoryStore.getLessonByName(name) != null
+    suspend operator fun invoke(name: String): Boolean {
+        return lessonRepository.exists(name)
     }
 }

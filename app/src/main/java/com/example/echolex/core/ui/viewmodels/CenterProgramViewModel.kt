@@ -20,10 +20,6 @@ class CenterProgramViewModel @Inject constructor(
         notificationCenter.closeNotification()
     }
 
-    fun resetNotification() {
-        notificationCenter.setNotification(AppNotification.Null)
-    }
-
     fun resetNavigationTarget() {
         navigationCenter.resetTarget()
     }

@@ -4,187 +4,154 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.echolex.core.domain.data.model.deck.Card
 import com.example.echolex.core.domain.data.model.lesson.Lesson
+import com.example.echolex.core.domain.data.model.lesson.StageType
 import com.example.echolex.core.domain.data.model.notification.AppNotification
-import com.example.echolex.core.domain.useCase.lesson.LessonLearningUseCase
+import com.example.echolex.core.domain.data.repository.DeckRepository
+import com.example.echolex.core.domain.data.repository.LessonRepository
 import com.example.echolex.core.domain.useCase.lesson.GetCurrentLessonUseCase
+import com.example.echolex.core.domain.useCase.screensUseCases.BackToPreviousScreenUseCase
+import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.logHere
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LessonLearningViewModel @Inject constructor(
-    private val lessonLearningUseCase: LessonLearningUseCase,
-    private val getCurrentLessonUseCase: GetCurrentLessonUseCase
+    private val getCurrentLessonUseCase: GetCurrentLessonUseCase,
+    private val openAppNotificationUseCase: OpenAppNotificationUseCase,
+    private val backToPreviousScreenUseCase: BackToPreviousScreenUseCase,
+    private val saveLessonUseCase: SaveLessonUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<LessonLearningUiState>(LessonLearningUiState.Loading)
+    private var lesson: Lesson? = null
+
+    private val _uiState = MutableStateFlow(LessonLearningUiState.initial())
     val uiState: StateFlow<LessonLearningUiState> = _uiState.asStateFlow()
 
-    private var currentLesson: Lesson? = null
-    private var currentCard: Card? = null
+    private val _event = MutableSharedFlow<LessonLearningEvent>(extraBufferCapacity = 1)
+    val event = _event.asSharedFlow()
 
     init {
-        loadCurrentLesson()
+        viewModelScope.launch {
+            getCurrentLessonUseCase()
+                .onSuccess { loaded ->
+                    lesson = loaded
+                    step(wasIncorrect = false)
+                }
+                .onFailure { e ->
+                    openAppNotificationUseCase(
+                        AppNotification.Error.Generic(
+                            e.message ?: "Lesson load error"
+                        )
+                    )
+                }
+        }
     }
 
-    private fun loadCurrentLesson() {
-        viewModelScope.launch {
-            val lesson = getCurrentLessonUseCase()
-            if (lesson != null) {
-                startLesson(lesson)
-            } else {
-                _uiState.value = LessonLearningUiState.Error(
-                    AppNotification.Error.Generic("Урок не знайдено")
-                )
+    fun onKnow() = step(wasIncorrect = false)
+    fun onDoNotKnow() = step(wasIncorrect = true)
+
+    private fun step(wasIncorrect: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val l = lesson ?: return@launch
+
+            val result = l.validation(wasIncorrectAnswer = wasIncorrect)
+
+
+            result.notification?.let { n ->
+                when (n) {
+                    is AppNotification.Lesson.LessonNextStage -> {
+                        saveLessonUseCase(l)
+                    }
+
+                    is AppNotification.Lesson.LessonFinished -> {
+                        if (result.ui == null) {
+                            saveLessonUseCase(l)
+                            openAppNotificationUseCase(AppNotification.Lesson.LessonFinished)
+
+                        } else {
+                            saveLessonUseCase(l)
+                            _event.emit(LessonLearningEvent.ShowToast(AppNotification.Lesson.LessonLessonRestart))
+                        }
+                        backToPreviousScreenUseCase()
+                    }
+
+                    AppNotification.Null -> Unit
+                    else ->
+                        _event.emit(LessonLearningEvent.ShowToast(n))
+                }
+            }
+            result.ui?.let { nextUi ->
+                _uiState.value = nextUi.copy(isFlipped = false)
             }
         }
     }
 
-    // Функція для ініціалізації з параметрами навігації
-    fun initializeWithLesson(lesson: Lesson) {
-        startLesson(lesson)
-    }
-
-    fun startLesson(lesson: Lesson) {
-        viewModelScope.launch {
-            _uiState.value = LessonLearningUiState.Loading
-            
-            // Валідуємо урок перед початком
-            val validationResult = lessonLearningUseCase.validateLesson(lesson)
-            when (validationResult) {
-                is com.example.echolex.core.domain.service.lesson.LessonResult.Error -> {
-                    _uiState.value = LessonLearningUiState.Error(validationResult.notification)
-                    return@launch
-                }
-                is com.example.echolex.core.domain.service.lesson.LessonResult.UpdatedLesson -> {
-                    currentLesson = validationResult.lesson
-                }
-                else -> {
-                    _uiState.value = LessonLearningUiState.Error(AppNotification.Error.Generic("Invalid lesson"))
-                    return@launch
-                }
-            }
-            
-            loadNextCard()
-        }
-    }
-
-    fun loadNextCard() {
-        val lesson = currentLesson ?: return
-        
-        viewModelScope.launch {
-            val (card, error) = lessonLearningUseCase.getNextCardOrError(lesson)
-            
-            if (error != null) {
-                _uiState.value = LessonLearningUiState.Error(error)
-                return@launch
-            }
-            
-            if (card == null) {
-                _uiState.value = LessonLearningUiState.Completed
-                return@launch
-            }
-            
-            currentCard = card
-            
-            val (stageInfo, stageError) = lessonLearningUseCase.getStageInfoOrError(lesson)
-            val (progress, progressError) = lessonLearningUseCase.getProgressOrError(lesson)
-            
-            if (stageError != null) {
-                _uiState.value = LessonLearningUiState.Error(stageError)
-                return@launch
-            }
-            
-            if (progressError != null) {
-                _uiState.value = LessonLearningUiState.Error(progressError)
-                return@launch
-            }
-            
-            _uiState.value = LessonLearningUiState.ShowCard(
-                card = card,
-                stageInfo = stageInfo ?: "Невідомий етап",
-                progress = progress ?: 0f
-            )
-        }
-    }
-
-    fun onCardCorrect() {
-        val lesson = currentLesson ?: return
-        val card = currentCard ?: return
-
-        viewModelScope.launch {
-            val result = lessonLearningUseCase.markCardAsCorrect(lesson, card)
-            
-            when (result) {
-                is com.example.echolex.core.domain.service.lesson.LessonResult.UpdatedLesson -> {
-                    currentLesson = result.lesson
-                    loadNextCard()
-                }
-                is com.example.echolex.core.domain.service.lesson.LessonResult.Error -> {
-                    _uiState.value = LessonLearningUiState.Error(result.notification)
-                }
-                is com.example.echolex.core.domain.service.lesson.LessonResult.Completed -> {
-                    _uiState.value = LessonLearningUiState.Completed
-                }
-                else -> {
-                    _uiState.value = LessonLearningUiState.Error(AppNotification.Error.Generic("Unexpected result"))
-                }
-            }
-        }
-    }
-
-    fun onCardIncorrect() {
-        val lesson = currentLesson ?: return
-        val card = currentCard ?: return
-
-        viewModelScope.launch {
-            val result = lessonLearningUseCase.markCardAsIncorrect(lesson, card)
-            
-            when (result) {
-                is com.example.echolex.core.domain.service.lesson.LessonResult.UpdatedLesson -> {
-                    currentLesson = result.lesson
-                    loadNextCard()
-                }
-                is com.example.echolex.core.domain.service.lesson.LessonResult.Error -> {
-                    _uiState.value = LessonLearningUiState.Error(result.notification)
-                }
-                is com.example.echolex.core.domain.service.lesson.LessonResult.Completed -> {
-                    _uiState.value = LessonLearningUiState.Completed
-                }
-                else -> {
-                    _uiState.value = LessonLearningUiState.Error(AppNotification.Error.Generic("Unexpected result"))
-                }
-            }
-        }
+    fun onExit() {
+        backToPreviousScreenUseCase()
     }
 
     fun flipCard() {
-        val currentState = _uiState.value
-        if (currentState is LessonLearningUiState.ShowCard) {
-            _uiState.value = currentState.copy(
-                card = currentState.card.flipCard()
-            )
-        }
-    }
-    
-    fun dismissError() {
-        val currentState = _uiState.value
-        if (currentState is LessonLearningUiState.Error) {
-            loadNextCard()
-        }
+        _uiState.value = _uiState.value.copy(
+            isFlipped = !_uiState.value.isFlipped
+        )
     }
 }
 
-sealed class LessonLearningUiState {
-    object Loading : LessonLearningUiState()
-    data class ShowCard(
-        val card: Card,
-        val stageInfo: String,
-        val progress: Float
-    ) : LessonLearningUiState()
-    data class Error(val notification: AppNotification) : LessonLearningUiState()
-    object Completed : LessonLearningUiState()
+data class LessonLearningUiState(
+    val isFlipped: Boolean = false,
+
+    val card: Card,
+    val remainingCards: Int,
+    val remainingCycles: Int,
+    val wasIncorrect: Boolean,
+    val currentIndexStage: Int,
+    val stageCount: Int,
+) {
+    companion object {
+        fun initial(): LessonLearningUiState =
+            LessonLearningUiState(
+                card = Card("", ""),
+                remainingCards = 0,
+                remainingCycles = 0,
+                wasIncorrect = false,
+                currentIndexStage = 0,
+                stageCount = 0,
+            )
+    }
+}
+
+sealed interface LessonLearningEvent {
+    data class ShowToast(val notification: AppNotification) : LessonLearningEvent
+}
+
+class SaveLessonUseCase @Inject constructor(
+    private val lessonRepository: LessonRepository
+) {
+    suspend operator fun invoke(lesson: Lesson) {
+        lessonRepository.upsert(lesson)
+    }
+}
+
+class IncrementRepeatedCardsUseCase @Inject constructor(
+    private val deckRepository: DeckRepository
+) {
+    suspend operator fun invoke(cards: List<Card>, deckNames: List<String>) {
+        deckRepository.incrementCardsRepeatingInDeck(cards, deckNames)
+    }
+}
+
+class MarkCardsAsPreLearnedUseCase @Inject constructor(
+    private val deckRepository: DeckRepository
+) {
+    suspend operator fun invoke(cards: List<Card>, deckNames: List<String>) {
+        deckRepository.markCardsAsPreLearned(cards, deckNames)
+    }
 }

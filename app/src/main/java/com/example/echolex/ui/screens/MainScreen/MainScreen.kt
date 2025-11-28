@@ -70,16 +70,7 @@ fun MainMenuScreenContent(viewModel: MainMenuViewModel) {
                     }
                     Spacer(modifier = Modifier
                         .height(20.dp))
-                    
-                    AppButton(
-                        text = "Очистити всі дані",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
-                        onClick = {
-                            viewModel.clearAllData()
-                        }
-                    )
+
                 }
             }
         }

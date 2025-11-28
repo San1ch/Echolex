@@ -8,7 +8,6 @@ import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
 import com.example.echolex.core.domain.useCase.deck.AllCardsStats
 import com.example.echolex.core.domain.useCase.deck.GetDecksCopyStatUseCase
-import com.example.echolex.core.domain.useCase.lesson.ClearAllDataUseCase
 import com.example.echolex.core.domain.useCase.screensUseCases.NavigateToScreenUseCase
 import com.example.echolex.core.navigation.NavigationTarget.DeckScreens
 import com.example.echolex.core.navigation.NavigationTarget.LessonScreens
@@ -26,7 +25,6 @@ import javax.inject.Inject
 class MainMenuViewModel @Inject constructor(
     private val getDecksCopyStatUseCase: GetDecksCopyStatUseCase,
     private val navigateToScreenUseCase: NavigateToScreenUseCase,
-    private val clearAllDataUseCase: ClearAllDataUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MainMenuUiState>(MainMenuUiState.Loading)
@@ -97,13 +95,6 @@ class MainMenuViewModel @Inject constructor(
 
     fun openLessonMenu() {
         navigateToScreenUseCase(LessonScreens.Lesson)
-    }
-    
-    fun clearAllData() {
-        viewModelScope.launch {
-            clearAllDataUseCase()
-            loadInitialData()
-        }
     }
 }
 

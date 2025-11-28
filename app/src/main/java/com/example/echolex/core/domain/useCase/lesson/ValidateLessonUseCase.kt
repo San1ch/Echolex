@@ -21,11 +21,11 @@ class ValidateLessonUseCase @Inject constructor(
     }
 
     private fun validateIndexCount(lesson: Lesson): Boolean {
-        if(lesson.config.deckNames.isEmpty()) {
+        if(lesson.parameters.deckNames.isEmpty()) {
             openAppNotificationUseCase(AppNotification.Business.LessonDecksAreEmpty)
             return false
         }
-        if(lesson.config.stages.isEmpty()) {
+        if(lesson.parameters.stages.isEmpty()) {
             openAppNotificationUseCase(AppNotification.Business.BlueprintsStagesAreEmpty)
             return false
         }

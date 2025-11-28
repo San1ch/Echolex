@@ -6,7 +6,7 @@ import javax.inject.Inject
 class SetSharedDeckNameUseCase @Inject constructor(
     private val sharedDataMemoryStore: SharedDataMemoryStore
 ) {
-    suspend operator fun invoke(deckName: String) {
-        sharedDataMemoryStore.setDeckName(deckName)
+    suspend operator fun <T : Any> invoke(key: String, value: T) {
+        sharedDataMemoryStore.set(key, value)
     }
 }

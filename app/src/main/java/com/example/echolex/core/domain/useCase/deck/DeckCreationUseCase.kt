@@ -76,19 +76,20 @@ class CheckSameDeckUseCase @Inject constructor(
 class CardParserService @Inject constructor() {
     suspend fun parseCards(data: DataDeck): List<Card> {
         return data.words
-            .split(";")
+            .lines()
+            .map(String::trim)
+            .filter(String::isNotEmpty)
             .mapNotNull { line ->
-                val parts = line.trim().split(",")
-                if (parts.size == 2) {
-                    val word = parts[0].trim()
-                    val translation = parts[1].trim()
-                    if (word.isNotEmpty() && translation.isNotEmpty()) {
-                        Card(
-                            firstWord = word,
-                            secondWord = translation,
-                            isPreLearned = data.isPreLearned
-                        )
-                    } else null
+                val parts = line.split(",", limit = 2).map { it.trim() }
+                val word = parts.getOrNull(0).orEmpty()
+                val translation = parts.getOrNull(1).orEmpty()
+
+                if (word.isNotEmpty() && translation.isNotEmpty()) {
+                    Card(
+                        firstWord = word,
+                        secondWord = translation,
+                        isPreLearned = data.isPreLearned
+                    )
                 } else null
             }
     }

@@ -1,10 +1,10 @@
 package com.example.echolex.core.domain.useCase.deck
 
-import com.example.echolex.core.domain.data.repository.DeckMemoryStore
+import com.example.echolex.core.domain.data.repository.DeckRepository
 import javax.inject.Inject
 
 class GetDecksCopyUseCase @Inject constructor(
-    private val deckMemoryStore: DeckMemoryStore
+    private val deckRepository: DeckRepository
 ) {
-    suspend operator fun invoke() = deckMemoryStore.decks.value.toList()
+    suspend operator fun invoke() = deckRepository.decks.value.toList()
 }

@@ -7,27 +7,18 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SharedDataMemoryStore @Inject constructor(){
-    private val state = MutableStateFlow<SharedDataMemoryStoreState>(SharedDataMemoryStoreState())
+class SharedDataMemoryStore @Inject constructor() {
+    private val _state = MutableStateFlow<Map<String, Any>>(emptyMap())
+    val state: StateFlow<Map<String, Any>> = _state.asStateFlow()
 
-    suspend fun setDeckName(name: String) {
-        state.value = state.value.copy(
-            deckNameForItemDeckInfo = name
-        )
-    }
-    
-    suspend fun setCurrentLessonName(name: String) {
-        state.value = state.value.copy(
-            currentLessonName = name
-        )
+    fun <T : Any> set(key: String, value: T) {
+        _state.value = _state.value.toMutableMap().apply {
+            this[key] = value
+        }
     }
 
-    fun getState(): StateFlow<SharedDataMemoryStoreState> {
-        return state.asStateFlow()
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Any> get(key: String): T? {
+        return _state.value[key] as? T
     }
 }
-
-data class SharedDataMemoryStoreState(
-    val deckNameForItemDeckInfo: String = "",
-    val currentLessonName: String = ""
-)

@@ -19,6 +19,7 @@ sealed interface AppNotification {
             override val title = "Deck Exported"
             override val message = "Deck successfully exported."
         }
+
     }
 
     sealed interface Error : AppNotification {
@@ -56,7 +57,7 @@ sealed interface AppNotification {
 
         object InvalidCommaFormat : Validation {
             override val title = "Invalid Format"
-            override val message = "Each entry must contain exactly one word, comma, translation and separating."
+            override val message = "Each entry must contain exactly one word, comma, translation and paragraph."
         }
 
         object EmptyWordOrTranslation : Validation {
@@ -79,6 +80,11 @@ sealed interface AppNotification {
         object SameDeckName : Business {
             override val title = "Same Name"
             override val message = "The deck with that name already exists."
+        }
+
+        object DecksDoNotExist : Business {
+            override val title = "Decks Do Not Exist"
+            override val message = "No decks found. Please create a deck first."
         }
 
         data class SameCards(val cardWord: String) : Business {
@@ -129,5 +135,38 @@ sealed interface AppNotification {
             override val title = "Error"
             override val message = "Lesson doesn't exist"
         }
+    }
+
+    sealed interface Lesson : AppNotification {
+        object LessonFinished : Lesson {
+            override val title = "Lesson Finished"
+            override val message = "Lesson successfully finished."
+        }
+
+        object LessonLessonRestart : Lesson {
+            override val title = ""
+            override val message = "Full lesson restarted."
+        }
+
+        object LessonStageRestarted : Lesson {
+            override val title = ""
+            override val message = "Lesson restarted"
+        }
+
+        object LessonNextStage : Lesson {
+            override val title = ""
+            override val message = "Next stage"
+        }
+
+        object LessonNextCycle : Lesson {
+            override val title = ""
+            override val message = "Next cycle"
+        }
+
+        object LessonNextCard : Lesson {
+            override val title = ""
+            override val message = "Next card"
+        }
+
     }
 }

@@ -140,7 +140,7 @@ fun DeckItemScreenContent(viewModel: DeckItemViewModel) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(520.dp)
+                            .height(400.dp)
                     ) {
                         LazyColumn(modifier = Modifier) {
                             items(localDeck.cards.size) { card ->

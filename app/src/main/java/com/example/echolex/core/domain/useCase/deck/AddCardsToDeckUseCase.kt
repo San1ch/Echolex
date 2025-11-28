@@ -4,19 +4,19 @@ import com.example.echolex.core.domain.data.model.notification.AppNotification
 import com.example.echolex.core.domain.data.model.deck.Card
 import com.example.echolex.core.domain.data.model.deck.Deck
 import com.example.echolex.core.domain.data.repository.DeckFindResult
-import com.example.echolex.core.domain.data.repository.DeckMemoryStore
+import com.example.echolex.core.domain.data.repository.DeckRepository
 import com.example.echolex.core.domain.service.DataDeck
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
 import javax.inject.Inject
 
 class AddCardsToDeckUseCase @Inject constructor(
     private val parserService: CardParserService,
-    private val deckMemoryStore: DeckMemoryStore,
+    private val deckRepository: DeckRepository,
     private val openAppNotificationUseCase: OpenAppNotificationUseCase,
     private val validateDeckImportUseCase: ValidateDeckImportUseCase
 ) {
     suspend operator fun invoke(nameDeckToAdd: String, dataDeck: DataDeck): Boolean {
-        val foundDeckResult = deckMemoryStore.getDeckByName(nameDeckToAdd)
+        val foundDeckResult = deckRepository.getDeckByName(nameDeckToAdd)
         when (foundDeckResult) {
             is DeckFindResult.NotFound -> {
                 openAppNotificationUseCase(AppNotification.Business.DeckDoesNotExist)
@@ -39,7 +39,7 @@ class AddCardsToDeckUseCase @Inject constructor(
                     return false
                 }
 
-                deckMemoryStore.updateDeck(Deck(nameDeckToAdd, cards + foundDeck.cards))
+                deckRepository.updateDeck(Deck(nameDeckToAdd, cards + foundDeck.cards))
 
                 openAppNotificationUseCase(AppNotification.Null)
                 return true

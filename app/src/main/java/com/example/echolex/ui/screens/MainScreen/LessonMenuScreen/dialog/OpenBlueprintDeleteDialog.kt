@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.echolex.R
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuViewModel
-import com.example.echolex.ui.customDesign.StandardYesNoDialog
 
 @Composable
 fun OpenBlueprintDeleteDialog(viewModel: LessonMenuViewModel) {

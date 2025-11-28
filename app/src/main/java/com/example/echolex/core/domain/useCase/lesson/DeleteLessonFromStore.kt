@@ -2,26 +2,25 @@ package com.example.echolex.core.domain.useCase.lesson
 
 import com.example.echolex.core.domain.data.model.lesson.Lesson
 import com.example.echolex.core.domain.data.model.notification.AppNotification
-import com.example.echolex.core.domain.data.repository.LessonMemoryStore
+import com.example.echolex.core.domain.data.repository.LessonRepository
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
 import javax.inject.Inject
 
 class DeleteLessonFromStore @Inject constructor(
-    private val lessonMemoryStore: LessonMemoryStore,
+    private val lessonRepository: LessonRepository,
     private val getLessonByNameUseCase: GetLessonByNameUseCase,
     private val openAppNotificationUseCase: OpenAppNotificationUseCase
 ) {
-    operator fun invoke(lesson: Lesson): Boolean {
-        val result = getLessonByNameUseCase(lesson.name)
-        return when(result) {
-            is LessonResult.Success -> {
-                lessonMemoryStore.removeLesson(result.lesson)
-                true
+    suspend operator fun invoke(lesson: Lesson): Boolean {
+        val result: Result<Lesson> = getLessonByNameUseCase(lesson.name)
+
+        return result
+            .onSuccess { foundLesson ->
+                lessonRepository.deleteByName(foundLesson.name)
             }
-            is LessonResult.NotFound -> {
+            .onFailure {
                 openAppNotificationUseCase(AppNotification.Business.LessonDoesNotExist)
-                false
             }
-        }
+            .isSuccess
     }
 }

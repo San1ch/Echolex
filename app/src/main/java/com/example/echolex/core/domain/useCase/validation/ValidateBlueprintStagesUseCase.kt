@@ -8,8 +8,8 @@ import javax.inject.Inject
 class ValidateBlueprintStagesUseCase @Inject constructor(
     private val openAppNotificationUseCase: OpenAppNotificationUseCase
 ) {
-    operator fun invoke(blueprint: LessonBlueprint): Boolean {
-        if(blueprint.stages.isEmpty()) {
+    operator fun invoke(lessonBlueprint: LessonBlueprint): Boolean {
+        if(lessonBlueprint.stages.isEmpty()) {
             openAppNotificationUseCase(AppNotification.Business.BlueprintsStagesAreEmpty)
             return false
         }
@@ -20,8 +20,8 @@ class ValidateBlueprintStagesUseCase @Inject constructor(
 class ValidateBlueprintSettingsUseCase @Inject constructor(
     private val openAppNotificationUseCase: OpenAppNotificationUseCase
 ) {
-    operator fun invoke(blueprint: LessonBlueprint): Boolean {
-        val validationResult = validate(blueprint)
+    operator fun invoke(lessonBlueprint: LessonBlueprint): Boolean {
+        val validationResult = validate(lessonBlueprint)
         if(validationResult != AppNotification.Null) {
             openAppNotificationUseCase(validationResult)
             return false
@@ -29,8 +29,8 @@ class ValidateBlueprintSettingsUseCase @Inject constructor(
         return true
     }
 
-    private fun validate(blueprint: LessonBlueprint): AppNotification {
-        val settings = blueprint.settings
+    private fun validate(lessonBlueprint: LessonBlueprint): AppNotification {
+        val settings = lessonBlueprint.settings
         // TODO: add validation for future settings
         return AppNotification.Null
     }

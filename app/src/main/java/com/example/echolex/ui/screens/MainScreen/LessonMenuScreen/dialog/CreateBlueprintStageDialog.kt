@@ -85,7 +85,7 @@ private fun CreateBlueprintRepeatStage(viewModel: LessonMenuViewModel) {
             maxCycles = MAX_COUNT_OF_CORRECT_CYCLES_FOR_REPEATING,
         )
 
-        if(stage.cardSelectionMode != CardSelectionMode.RANDOM) {
+        if(stage.cardSelectionMode != CardSelectionMode.Random) {
             AppSliderLabelCount(
                 text = stringResource(R.string.priority) + ": ",
                 value = stage.priority.toFloat(),
@@ -99,7 +99,7 @@ private fun CreateBlueprintRepeatStage(viewModel: LessonMenuViewModel) {
             .fillMaxWidth()
             .wrapContentHeight()){
             AppBorderButton(
-                text = stage.cardSelectionMode.name,
+                text = stage.cardSelectionMode.label,
                 onClick = { viewModel.dialogCenter.openChooseSelectionModeDialog() },
                 modifier = Modifier.width(200.dp),
                 borderWidth = 1.dp,
@@ -155,7 +155,7 @@ private fun CreateBlueprintLearnStage(viewModel: LessonMenuViewModel) {
             minCards = MIN_COUNT_OF_CARDS_FOR_LEARNING,
             maxCards = MAX_COUNT_OF_CARDS_FOR_LEARNING,
             minCycles = MIN_COUNT_OF_CORRECT_CYCLES_FOR_LEARNING,
-            maxCycles = MIN_COUNT_OF_CORRECT_CYCLES_FOR_LEARNING,
+            maxCycles = MAX_COUNT_OF_CORRECT_CYCLES_FOR_LEARNING,
         )
 
         DualButtonRow(

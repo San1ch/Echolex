@@ -1,10 +1,6 @@
 package com.example.echolex.core.domain.useCase.blueprint
 
 import com.example.echolex.core.domain.data.model.lesson.LessonBlueprint
-import com.example.echolex.core.domain.data.repository.LessonBlueprintMemoryStore
-import com.example.echolex.core.domain.service.centralScreenService.NotificationCenter
-import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
-import com.example.echolex.core.domain.useCase.blueprint.ValidateBlueprintNameUseCase
 import com.example.echolex.core.domain.useCase.validation.ValidateBlueprintStagesUseCase
 import javax.inject.Inject
 
@@ -14,11 +10,11 @@ class CreateBlueprintUseCase @Inject constructor(
     private val addLessonBlueprintUseCase: AddLessonBlueprintUseCase
 ) {
 
-    operator fun invoke(blueprint: LessonBlueprint): Boolean {
-        if (!nameValidate.invoke(blueprint.name)) return false
-        if (!stagesValidate.invoke(blueprint)) return false
+    suspend operator fun invoke(lessonBlueprint: LessonBlueprint): Boolean {
+        if (!nameValidate.invoke(lessonBlueprint.name)) return false
+        if (!stagesValidate.invoke(lessonBlueprint)) return false
 
-        addLessonBlueprintUseCase(blueprint)
+        addLessonBlueprintUseCase(lessonBlueprint)
         return true
     }
 }

@@ -1,20 +1,21 @@
 package com.example.echolex.core.domain.useCase.deck
 
 import com.example.echolex.core.domain.data.model.notification.AppNotification
-import com.example.echolex.core.domain.data.repository.DeckMemoryStore
+import com.example.echolex.core.domain.data.repository.DeckFindResult
+import com.example.echolex.core.domain.data.repository.DeckRepository
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
 import javax.inject.Inject
 
 class RemoveDeckUseCase @Inject constructor(
-    val deckMemoryStore: DeckMemoryStore,
+    val deckRepository: DeckRepository,
     private val openAppNotificationUseCase: OpenAppNotificationUseCase
 ) {
     suspend operator fun invoke(name: String){
-        val foundDeck = deckMemoryStore.getDeckByName(name)
-        if(foundDeck == null){
+        val foundDeck = deckRepository.getDeckByName(name)
+        if(foundDeck is DeckFindResult.NotFound){
             return openAppNotificationUseCase(AppNotification.Business.DeckDoesNotExist)
         }
-        deckMemoryStore.removeDeckByName(name)
+        deckRepository.removeDeckByName(name)
         return openAppNotificationUseCase(AppNotification.Null)
     }
 }

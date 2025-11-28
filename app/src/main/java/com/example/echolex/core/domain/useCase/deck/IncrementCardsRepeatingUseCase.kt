@@ -3,16 +3,16 @@ package com.example.echolex.core.domain.useCase.deck
 import com.example.echolex.core.domain.data.model.deck.Card
 import com.example.echolex.core.domain.data.model.notification.AppNotification
 import com.example.echolex.core.domain.data.repository.DeckFindResult
-import com.example.echolex.core.domain.data.repository.DeckMemoryStore
+import com.example.echolex.core.domain.data.repository.DeckRepository
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
 import javax.inject.Inject
 
 class IncrementCardsRepeatingUseCase @Inject constructor(
-    private val deckMemoryStore: DeckMemoryStore,
+    private val deckRepository: DeckRepository,
     private val openAppNotificationUseCase: OpenAppNotificationUseCase
 ) {
     suspend operator fun invoke(deckName: String, cardsToIncrement: List<Card>) {
-        val deckResult = deckMemoryStore.getDeckByName(deckName)
+        val deckResult = deckRepository.getDeckByName(deckName)
         when (deckResult) {
             is DeckFindResult.Success -> {
                 val deck = deckResult.deck
@@ -24,7 +24,7 @@ class IncrementCardsRepeatingUseCase @Inject constructor(
                     } else card
                 }
 
-                deckMemoryStore.updateDeck(deck.copy(cards = updatedCards))
+                deckRepository.updateDeck(deck.copy(cards = updatedCards))
             }
 
             is DeckFindResult.NotFound -> {

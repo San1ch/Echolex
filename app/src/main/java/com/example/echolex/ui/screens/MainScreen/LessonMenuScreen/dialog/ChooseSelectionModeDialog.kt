@@ -54,7 +54,7 @@ fun ChooseSelectionModeDialog(viewModel: LessonMenuViewModel) {
             AppBorderButton(
                 text = stringResource(R.string.random),
                 onClick = {
-                    viewModel.chooseSelectionMode(CardSelectionMode.RANDOM)
+                    viewModel.chooseSelectionMode(CardSelectionMode.Random)
                 }
             )
 
@@ -63,7 +63,7 @@ fun ChooseSelectionModeDialog(viewModel: LessonMenuViewModel) {
             AppBorderButton(
                 text = stringResource(R.string.prefer_low_priority),
                 onClick = {
-                    viewModel.chooseSelectionMode(CardSelectionMode.PREFER_LOW_PRIORITY)
+                    viewModel.chooseSelectionMode(CardSelectionMode.PreferLowPriority)
                 }
             )
 
@@ -72,7 +72,7 @@ fun ChooseSelectionModeDialog(viewModel: LessonMenuViewModel) {
             AppBorderButton(
                 text = stringResource(R.string.prefer_high_priority),
                 onClick = {
-                    viewModel.chooseSelectionMode(CardSelectionMode.PREFER_HIGH_PRIORITY)
+                    viewModel.chooseSelectionMode(CardSelectionMode.PreferHighPriority)
                 }
             )
 
@@ -81,7 +81,7 @@ fun ChooseSelectionModeDialog(viewModel: LessonMenuViewModel) {
             AppBorderButton(
                 text = stringResource(R.string.lock_to_priority),
                 onClick = {
-                    viewModel.chooseSelectionMode(CardSelectionMode.LOCK_TO_PRIORITY)
+                    viewModel.chooseSelectionMode(CardSelectionMode.LockToPriority)
                 }
             )
         }

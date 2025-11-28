@@ -1,11 +1,11 @@
 package com.example.echolex.core.domain.useCase.deck
 
-import com.example.echolex.core.domain.data.repository.DeckMemoryStore
+import com.example.echolex.core.domain.data.repository.DeckRepository
 import javax.inject.Inject
 
 class DeckExistsByNameUseCase @Inject constructor(
-    private val deckMemoryStore: DeckMemoryStore,){
+    private val deckRepository: DeckRepository,){
     operator fun invoke(name: String): Boolean {
-        return deckMemoryStore.deckExists(name)
+        return deckRepository.deckExists(name)
     }
 }

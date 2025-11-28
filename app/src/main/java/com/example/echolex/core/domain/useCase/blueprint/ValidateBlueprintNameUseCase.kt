@@ -1,10 +1,7 @@
 package com.example.echolex.core.domain.useCase.blueprint
 
 import com.example.echolex.core.constants.MAX_BLUEPRINT_NAME_LENGTH
-import com.example.echolex.core.constants.MAX_DECK_NAME_LENGTH
 import com.example.echolex.core.constants.MIN_BLUEPRINT_NAME_LENGTH
-import com.example.echolex.core.constants.MIN_DECK_NAME_LENGTH
-import com.example.echolex.core.domain.data.model.lesson.LessonBlueprint
 import com.example.echolex.core.domain.data.model.notification.AppNotification
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
 import com.example.echolex.core.domain.useCase.validation.BaseNameValidationBuilderUseCase

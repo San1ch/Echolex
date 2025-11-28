@@ -54,6 +54,7 @@ android {
 
 dependencies {
     implementation(libs.hilt)
+    implementation(libs.androidx.constraintlayout)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.compose)
 
@@ -63,8 +64,11 @@ dependencies {
     implementation (libs.gson)
 
     implementation(libs.nav.compose)
-
     implementation(libs.constraintlayout.compose)
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler.ksp)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

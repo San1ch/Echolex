@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.echolex.R
-import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuDialogState
+import com.example.echolex.core.ui.dialog.LessonMenuDialogState
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuScreenUiState
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuUiState
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuViewModel
@@ -58,6 +58,7 @@ import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.ChooseS
 import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.ChooseSelectionModeInfoDialog
 import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.CreateBlueprintStageDialog
 import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.DeleteStageInCreateDialog
+import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.logHere
 import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.item.LessonItem
 import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.item.BlueprintItem
 import com.example.echolex.ui.theme.AppButtonBackgroundColor
@@ -111,6 +112,10 @@ fun DialogList(viewModel: LessonMenuViewModel = hiltViewModel()) {
 
         LessonMenuDialogState.SelectionModeInfo -> {
             ChooseSelectionModeInfoDialog(viewModel)
+        }
+
+        LessonMenuDialogState.CurrentCreatingStage -> {
+            //TODO()
         }
     }
 }
@@ -212,7 +217,7 @@ private fun AppContent(modifier: Modifier, uiState: State<LessonMenuUiState>) {
 
 @Composable
 private fun LessonsContent(viewModel: LessonMenuViewModel = hiltViewModel()) {
-    val lessonList = viewModel.lessonList.collectAsStateWithLifecycle()
+    val lessonList = viewModel.lessonList.collectAsStateWithLifecycle(emptyList())
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -294,8 +299,8 @@ private fun LessonsContent(viewModel: LessonMenuViewModel = hiltViewModel()) {
 
 @Composable
 private fun SettingsContent(viewModel: LessonMenuViewModel = hiltViewModel()) {
-    val blueprintList = viewModel.blueprintList.collectAsStateWithLifecycle()
-
+    val blueprintList = viewModel.blueprintList.collectAsStateWithLifecycle(emptyList())
+    logHere()
     Column(
         modifier = Modifier
             .fillMaxSize()

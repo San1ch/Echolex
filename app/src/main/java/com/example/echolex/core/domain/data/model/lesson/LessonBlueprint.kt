@@ -5,9 +5,7 @@ import com.example.echolex.core.constants.STANDARD_COUNT_OF_CARDS_FOR_REPEATING
 import com.example.echolex.core.constants.STANDARD_COUNT_OF_CORRECT_CYCLES_FOR_LEARNING
 import com.example.echolex.core.constants.STANDARD_COUNT_OF_CORRECT_CYCLES_FOR_REPEATING
 import com.example.echolex.core.constants.STANDARD_COUNT_REPEATING_PRIORITY
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class LessonBlueprint(
     val name: String,
     val stages: List<LessonStage>,

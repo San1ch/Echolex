@@ -53,22 +53,21 @@ class ContainsDigitsRule :
     RegexContainsRule(Regex("\\d"), AppNotification.Validation.ContainsDigits)
 
 class ContainsSpecialSymbolsRule : RegexContainsRule(
-    Regex("[^\\p{L}\\s,;’'ʼ-]+"),
+    Regex("[^\\p{L}\\s,;’'ʼ()\\-/]+"),
     AppNotification.Validation.ContainsSpecialSymbols
 )
 
-class EmptyEntryListValidationRule(
-) : ValidationRule<String> {
+class EmptyEntryListValidationRule : ValidationRule<String> {
     override fun validate(input: String): AppNotification {
-        val entries = input.split(";").filter { it.isNotBlank() }
-        return if (entries.isEmpty()) AppNotification.Validation.EmptyCardList else AppNotification.Null
+        val entries = input.entries()
+        return if (entries.isEmpty()) AppNotification.Validation.EmptyCardList
+        else AppNotification.Null
     }
 }
 
-class EntryCommaCountValidationRule(
-) : ValidationRule<String> {
+class EntryCommaCountValidationRule : ValidationRule<String> {
     override fun validate(input: String): AppNotification {
-        val entries = input.split(";").filter { it.isNotBlank() }
+        val entries = input.entries()
         for (entry in entries) {
             if (entry.count { it == ',' } != 1) {
                 return AppNotification.Validation.InvalidCommaFormat
@@ -77,5 +76,11 @@ class EntryCommaCountValidationRule(
         return AppNotification.Null
     }
 }
+private fun String.entries(): List<String> =
+    lineSequence()
+        .map(String::trim)
+        .filter(String::isNotEmpty)
+        .toList()
+
 
 //////

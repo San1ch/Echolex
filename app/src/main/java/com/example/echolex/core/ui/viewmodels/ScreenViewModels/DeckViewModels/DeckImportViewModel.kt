@@ -8,6 +8,7 @@ import com.example.echolex.core.domain.service.DataDeck
 import com.example.echolex.core.domain.useCase.screensUseCases.BackToPreviousScreenUseCase
 import com.example.echolex.core.domain.useCase.deck.CreateImportDeckUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -48,7 +49,7 @@ class DeckImportViewModel @Inject constructor(
     }
 
     fun startCreatingDeck() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (createImportDeckUseCase(buildData())) {
                 backToPreviousScreenUseCase()
             }

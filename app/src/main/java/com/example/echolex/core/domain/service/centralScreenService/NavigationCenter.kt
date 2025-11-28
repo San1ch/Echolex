@@ -9,10 +9,6 @@ import javax.inject.Singleton
 
 @Singleton
 class NavigationCenter @Inject constructor() {
-    //notifications
-    private val _notificationStatus = MutableStateFlow<AppNotification>(AppNotification.Null)
-    val notificationStatus: StateFlow<AppNotification> = _notificationStatus
-
     //navigation
     private val _shouldNavigateBack = MutableStateFlow(false)
     val shouldNavigateBack: StateFlow<Boolean> = _shouldNavigateBack

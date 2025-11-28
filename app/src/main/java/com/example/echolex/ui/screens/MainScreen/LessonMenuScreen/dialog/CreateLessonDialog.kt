@@ -1,6 +1,7 @@
 package com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog
 
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.echolex.R
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuViewModel
 import com.example.echolex.ui.customDesign.AppOutlinedTextField
@@ -47,10 +49,16 @@ import com.example.echolex.ui.theme.AppButtonContentColor
 import com.example.echolex.ui.theme.AppContentColor
 import com.example.echolex.ui.theme.nunitoVariableFont
 
-
+fun logHere(tag: String = "MyLog", msg: String = "", callerDepth: Int = 2) {
+    val stack = Throwable().stackTrace
+    val s = stack.getOrNull(callerDepth) ?: stack.last()
+    Log.d(tag, "${s.fileName}:${s.lineNumber}.${s.methodName} $msg")
+}
 @Composable
 fun CreateLessonDialog(viewModel: LessonMenuViewModel) {
-    val blueprintList = viewModel.blueprintList.collectAsState()
+
+    val blueprintList = viewModel.blueprintList.collectAsStateWithLifecycle(emptyList())
+    logHere()
     val deckList = viewModel.deckList.collectAsState()
 
     var selectedIndex by remember { mutableIntStateOf(0) }
@@ -203,7 +211,7 @@ fun CreateLessonDialog(viewModel: LessonMenuViewModel) {
                     val selectedBlueprint = blueprintList.value.getOrNull(selectedIndex)
                     if (selectedBlueprint != null) {
                         viewModel.createLesson(
-                            blueprint = selectedBlueprint,
+                            lessonBlueprint = selectedBlueprint,
                             decks = deckList.value.filterIndexed { index, _ -> checkedStates.value[index] })
                     }
                 },

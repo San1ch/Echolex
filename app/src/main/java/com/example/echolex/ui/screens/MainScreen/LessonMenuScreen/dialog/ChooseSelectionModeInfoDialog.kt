@@ -27,19 +27,19 @@ fun ChooseSelectionModeInfoDialog(viewModel: LessonMenuViewModel) {
         val currentStage = viewModel.uiState.value.currentCreatingStage
         val currentMode = currentStage.cardSelectionMode
         val text = when (currentMode) {
-            CardSelectionMode.RANDOM -> {
+            CardSelectionMode.Random -> {
                 stringResource(R.string.random_mode_info)
             }
 
-            CardSelectionMode.PREFER_LOW_PRIORITY -> {
+            CardSelectionMode.PreferLowPriority -> {
                 stringResource(R.string.prefer_low_priority_mode_info)
             }
 
-            CardSelectionMode.PREFER_HIGH_PRIORITY -> {
+            CardSelectionMode.PreferHighPriority -> {
                 stringResource(R.string.prefer_high_priority_mode_info)
             }
 
-            CardSelectionMode.LOCK_TO_PRIORITY -> {
+            CardSelectionMode.LockToPriority -> {
                 stringResource(R.string.lock_to_priority_mode_info)
             }
             else -> {
