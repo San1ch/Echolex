@@ -31,6 +31,17 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
+        create("staging") {
+            initWith(getByName("release"))     // бере налаштування як у release
+            matchingFallbacks += listOf("release")
+            applicationIdSuffix = ".staging"   // окрема програма на телефоні
+            versionNameSuffix = "-staging"
+            isDebuggable = false               // важливо: без дебагера = швидше
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

@@ -21,7 +21,7 @@ class Lesson @Inject constructor(
     internal var currentStageIndex: Int = -1
 
     /** Snapshot of the initial card set for the current stage (to replay on cycles/restart). */
-    internal var currentStageCardList: List<Card> = emptyList()
+    var currentStageCardList: List<Card> = emptyList()
 
     suspend fun start() {
         require(parameters.stages.isNotEmpty())
@@ -42,25 +42,31 @@ class Lesson @Inject constructor(
             changeableData.wasIncorrectAnswer = wasIncorrectAnswer
         }
 
-        var validator: LessonValidation = LessonValidationIsHaveCards()
+        var validator: LessonValidation = LessonValidationIsExistsCardsInStage()
 
         while (true) {
             when (val command = validator(this)) {
+                LessonValidationCommand.CardsAreNotExist -> {
+                    return LessonStepResult(
+                        ui = null,
+                        context = changeableData,
+                        notification = AppNotification.Lesson.CardsAreNotExist
+                    )
+                }
 
                 is LessonValidationCommand.NextValidation -> validator = command.nextValidation
 
-                LessonValidationCommand.NextCard -> return stepUi(notification = AppNotification.Null)
+                LessonValidationCommand.NextCard ->
+                    return stepUi(notification = AppNotification.Null)
 
                 LessonValidationCommand.NextCycle -> {
                     nextCycle()
-                    validator = LessonValidationIsHaveCards()
-                    return stepUi(notification = AppNotification.Lesson.LessonNextCycle)
+                    return stepUi(notification = AppNotification.Lesson.NextCycle)
                 }
 
                 LessonValidationCommand.RestartStage -> {
                     restartStage()
-                    validator = LessonValidationIsHaveCards()
-                    return stepUi(notification = AppNotification.Lesson.LessonStageRestarted)
+                    return stepUi(notification = AppNotification.Lesson.StageRestarted)
                 }
 
                 LessonValidationCommand.NextStage -> {
@@ -77,9 +83,8 @@ class Lesson @Inject constructor(
                     }
 
                     advanceToNextStageOrNull()
-                    validator = LessonValidationIsHaveCards()
 
-                    val result = stepUi(notification = AppNotification.Lesson.LessonNextStage)
+                    val result = stepUi(notification = AppNotification.Lesson.NextStage)
                     return result
                 }
 
@@ -101,7 +106,7 @@ class Lesson @Inject constructor(
                         restartLesson()
                         validator = LessonValidationIsHaveCards()
 
-                        val result = stepUi(notification = AppNotification.Lesson.LessonNextStage)
+                        val result = stepUi(notification = AppNotification.Lesson.NextStage)
                         return LessonStepResult(
                             ui = result.ui,
                             notification = AppNotification.Lesson.LessonFinished,
@@ -127,7 +132,6 @@ class Lesson @Inject constructor(
                         restartLesson()
                         return result
                     }
-
                 }
             }
         }
@@ -135,7 +139,7 @@ class Lesson @Inject constructor(
 
     private fun stepUi(notification: AppNotification?): LessonStepResult {
         val ui = LessonLearningUiState(
-            card = getNextCard(),
+            card = if (currentStageCardList.isNotEmpty()) getNextCard() else Card("", ""),
             remainingCards = changeableData.cards.size,
             remainingCycles = changeableData.cycles,
             wasIncorrect = changeableData.wasIncorrectAnswer,
@@ -192,7 +196,8 @@ class Lesson @Inject constructor(
         val stage = parameters.stages[currentStageIndex]
         changeableData = LessonStageData(
             type = stage.type,
-            cards = currentStageCardList.shuffled().toMutableList(),
+            cards = if (currentStageCardList.isNotEmpty()) currentStageCardList.shuffled()
+                .toMutableList() else emptyList<Card>().toMutableList(),
             cycles = changeableData.cycles,
             priority = stage.priority,
             cardSelectionMode = stage.cardSelectionMode,
@@ -232,6 +237,7 @@ class Lesson @Inject constructor(
 
 sealed class LessonValidationCommand {
     data class NextValidation(val nextValidation: LessonValidation) : LessonValidationCommand()
+    data object CardsAreNotExist : LessonValidationCommand()
     data object NextCard : LessonValidationCommand()
     data object NextCycle : LessonValidationCommand()
     data object NextStage : LessonValidationCommand()
@@ -241,6 +247,14 @@ sealed class LessonValidationCommand {
 
 interface LessonValidation {
     operator fun invoke(lesson: Lesson): LessonValidationCommand
+}
+
+class LessonValidationIsExistsCardsInStage : LessonValidation {
+    override fun invoke(lesson: Lesson): LessonValidationCommand =
+        if (lesson.currentStageCardList.isEmpty()) LessonValidationCommand.NextValidation(
+            LessonValidationCanAdvanceStage()
+        )
+        else LessonValidationCommand.NextValidation(LessonValidationIsHaveCards())
 }
 
 class LessonValidationIsHaveCards : LessonValidation {

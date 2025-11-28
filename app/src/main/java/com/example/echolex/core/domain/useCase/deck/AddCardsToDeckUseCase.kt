@@ -15,7 +15,11 @@ class AddCardsToDeckUseCase @Inject constructor(
     private val openAppNotificationUseCase: OpenAppNotificationUseCase,
     private val validateDeckImportUseCase: ValidateDeckImportUseCase
 ) {
-    suspend operator fun invoke(nameDeckToAdd: String, dataDeck: DataDeck): Boolean {
+    suspend operator fun invoke(
+        nameDeckToAdd: String,
+        dataDeck: DataDeck,
+        withFlipCards: Boolean
+    ): Boolean {
         val foundDeckResult = deckRepository.getDeckByName(nameDeckToAdd)
         when (foundDeckResult) {
             is DeckFindResult.NotFound -> {
@@ -38,8 +42,15 @@ class AddCardsToDeckUseCase @Inject constructor(
                     AppNotification.Business.SameCards(sameCardName)
                     return false
                 }
-
-                deckRepository.updateDeck(Deck(nameDeckToAdd, cards + foundDeck.cards))
+                val resultCards = if (withFlipCards) cards + cards.map {
+                    Card(
+                        firstWord = it.secondWord,
+                        secondWord = it.firstWord
+                    )
+                }else {
+                    cards
+                }
+                deckRepository.updateDeck(Deck(nameDeckToAdd, resultCards + foundDeck.cards))
 
                 openAppNotificationUseCase(AppNotification.Null)
                 return true

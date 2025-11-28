@@ -4,14 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.echolex.core.domain.data.model.deck.Card
 import com.example.echolex.core.domain.data.model.lesson.Lesson
-import com.example.echolex.core.domain.data.model.lesson.StageType
 import com.example.echolex.core.domain.data.model.notification.AppNotification
 import com.example.echolex.core.domain.data.repository.DeckRepository
 import com.example.echolex.core.domain.data.repository.LessonRepository
 import com.example.echolex.core.domain.useCase.lesson.GetCurrentLessonUseCase
 import com.example.echolex.core.domain.useCase.screensUseCases.BackToPreviousScreenUseCase
 import com.example.echolex.core.domain.useCase.screensUseCases.OpenAppNotificationUseCase
-import com.example.echolex.ui.screens.MainScreen.LessonMenuScreen.dialog.logHere
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -67,7 +65,11 @@ class LessonLearningViewModel @Inject constructor(
 
             result.notification?.let { n ->
                 when (n) {
-                    is AppNotification.Lesson.LessonNextStage -> {
+                    is AppNotification.Lesson.CardsAreNotExist -> {
+                        step(wasIncorrect = false)
+                    }
+
+                    is AppNotification.Lesson.NextStage -> {
                         saveLessonUseCase(l)
                     }
 
@@ -78,7 +80,7 @@ class LessonLearningViewModel @Inject constructor(
 
                         } else {
                             saveLessonUseCase(l)
-                            _event.emit(LessonLearningEvent.ShowToast(AppNotification.Lesson.LessonLessonRestart))
+                            _event.emit(LessonLearningEvent.ShowToast(AppNotification.Lesson.LessonRestart))
                         }
                         backToPreviousScreenUseCase()
                     }
@@ -88,8 +90,13 @@ class LessonLearningViewModel @Inject constructor(
                         _event.emit(LessonLearningEvent.ShowToast(n))
                 }
             }
-            result.ui?.let { nextUi ->
-                _uiState.value = nextUi.copy(isFlipped = false)
+            if(result.ui != null) {
+                result.ui.let { nextUi ->
+                    _uiState.value = nextUi.copy(isFlipped = false)
+                }
+            }
+            else {
+                step(wasIncorrect = false)
             }
         }
     }

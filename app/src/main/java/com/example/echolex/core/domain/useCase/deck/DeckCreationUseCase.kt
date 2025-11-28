@@ -15,12 +15,12 @@ class CreateEmptyDeckUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(data: DataDeck): Boolean {
         var notification = validateDeckNameUseCase(data.name)
-        if (notification != AppNotification.Null){
+        if (notification != AppNotification.Null) {
             openAppNotificationUseCase(notification)
             return false
         }
 
-        if (notification != AppNotification.Null){
+        if (notification != AppNotification.Null) {
             openAppNotificationUseCase(notification)
             return false
         }
@@ -39,7 +39,7 @@ class CreateImportDeckUseCase @Inject constructor(
     private val openAppNotificationUseCase: OpenAppNotificationUseCase,
     private val validateDeckImportUseCase: ValidateDeckImportUseCase
 ) {
-    suspend operator fun invoke(data: DataDeck): Boolean {
+    suspend operator fun invoke(data: DataDeck, withFlipCards: Boolean): Boolean {
         val notification = validateDeckImportUseCase(data.words)
         if (notification != AppNotification.Null) {
             openAppNotificationUseCase(notification)
@@ -53,7 +53,13 @@ class CreateImportDeckUseCase @Inject constructor(
         }
 
         val cards: List<Card> = cardParserService.parseCards(data)
-        addDeckToStoreUseCase(Deck(data.name, cards))
+        val resultList = if (withFlipCards) cards + cards.map {
+            Card(
+                firstWord = it.secondWord,
+                secondWord = it.firstWord
+            )
+        } else cards
+        addDeckToStoreUseCase(Deck(data.name, resultList))
 
         openAppNotificationUseCase(AppNotification.Null)
         return true
@@ -63,10 +69,10 @@ class CreateImportDeckUseCase @Inject constructor(
 
 class CheckSameDeckUseCase @Inject constructor(
     val getDeckByNameUseCase: GetDeckByNameUseCase
-){
-    suspend operator fun invoke(name: String): AppNotification{
+) {
+    suspend operator fun invoke(name: String): AppNotification {
         val foundDeck: Deck = getDeckByNameUseCase(name).first()
-        if(foundDeck.name!= ""){
+        if (foundDeck.name != "") {
             return AppNotification.Business.SameDeckName
         }
         return AppNotification.Null

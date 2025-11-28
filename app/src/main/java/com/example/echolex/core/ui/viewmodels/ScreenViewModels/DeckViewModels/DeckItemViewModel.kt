@@ -54,6 +54,7 @@ class DeckItemViewModel @Inject constructor(
     val changedNameTextField = mutableStateOf("")
     val importTextField = mutableStateOf("")
     val isMarkingLikePreLearned = mutableStateOf(false)
+    val withFlipCards = mutableStateOf(false)
 
     var currentCardToRemove: Card? = null
 
@@ -66,6 +67,9 @@ class DeckItemViewModel @Inject constructor(
         }
     }
 
+    fun toggleWithFlipCards() {
+        withFlipCards.value = !withFlipCards.value
+    }
 
     fun backScreen() {
         viewModelScope.launch {
@@ -139,10 +143,10 @@ class DeckItemViewModel @Inject constructor(
     }
 
     fun addImportCards() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val changed = addCardsToDeckUseCase(
                 screenDeck.value.name,
-                DataDeck("", importTextField.value, isMarkingLikePreLearned.value)
+                DataDeck("", importTextField.value, isMarkingLikePreLearned.value),withFlipCards.value
             )
             if (changed) {
                 backToPreviousScreenUseCase()
@@ -186,11 +190,9 @@ class DeckItemViewModel @Inject constructor(
         data object ImportCards : DeckItemDialogMode()
         data object RemoveDeck : DeckItemDialogMode()
     }
-
     sealed class ScreenUiLaunching() {
         data object Loading : ScreenUiLaunching()
         data class Success(val deck: Deck) : ScreenUiLaunching()
         data class Error(val message: String) : ScreenUiLaunching()
     }
-
 }

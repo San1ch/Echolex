@@ -63,6 +63,7 @@ import androidx.compose.ui.res.stringResource
 import com.example.echolex.R
 import com.example.echolex.ui.customDesign.AppButton
 import com.example.echolex.ui.customDesign.ItemRowBackground
+import com.example.echolex.ui.customDesign.LabeledCheckbox
 import com.example.echolex.ui.theme.AppButtonContentColor
 
 
@@ -321,7 +322,7 @@ private fun DialogImport(viewModel: DeckItemViewModel) {
                     )
                     .padding(24.dp)
                     .width(300.dp)
-                    .height(220.dp)
+                    .height(270.dp)
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -354,6 +355,12 @@ private fun DialogImport(viewModel: DeckItemViewModel) {
                     Spacer(
                         modifier = Modifier
                             .height(20.dp)
+                    )
+                    LabeledCheckbox(
+                        checked = viewModel.withFlipCards.value,
+                        onCheckedChange = { viewModel.toggleWithFlipCards() },
+                        text = stringResource(R.string.with_flip_card_list),
+
                     )
                     AppBorderButton(
                         stringResource(R.string.add_cards), {

@@ -47,8 +47,8 @@ fun StageItemCreating(
         ) {
             Text(
                 text = when (stage.type) {
-                    StageType.LEARNING -> "Н"
-                    StageType.REPEATING -> "П"
+                    StageType.LEARNING -> "L"
+                    StageType.REPEATING -> "R"
                 },
                 style = TextStyle(
                     fontSize = 12.sp,

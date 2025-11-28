@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import com.example.echolex.R
 import com.example.echolex.core.domain.data.model.lesson.StageType
 import com.example.echolex.core.ui.viewmodels.ScreenViewModels.LessonSettingsViewModels.LessonMenuViewModel
+import com.example.echolex.ui.customDesign.AppBorderButton
 import com.example.echolex.ui.customDesign.AppStandardDialogBackground
 import com.example.echolex.ui.customDesign.DualButtonRow
 import com.example.echolex.ui.theme.AppContentColor
@@ -40,7 +41,7 @@ fun ChooseStageModeDialog(viewModel: LessonMenuViewModel) {
                 )
             )
             
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             
             DualButtonRow(
                 leftButtonText = stringResource(R.string.learn),
@@ -50,6 +51,13 @@ fun ChooseStageModeDialog(viewModel: LessonMenuViewModel) {
                 },
                 onRightClick = {
                     viewModel.addStage(StageType.REPEATING)
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            AppBorderButton(
+                text = stringResource(R.string.cancel),
+                onClick = {
+                    viewModel.dialogCenter.createBlueprintDialog()
                 }
             )
         }

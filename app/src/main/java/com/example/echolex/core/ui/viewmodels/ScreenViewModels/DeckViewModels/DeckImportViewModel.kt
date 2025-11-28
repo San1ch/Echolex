@@ -15,7 +15,8 @@ import javax.inject.Inject
 data class DeckImportUiState(
     val nameText: String = "",
     val importText: String = "",
-    val markAsPreLearned: Boolean = false
+    val markAsPreLearned: Boolean = false,
+    val withFlipCards: Boolean = false
 )
 @HiltViewModel
 class DeckImportViewModel @Inject constructor(
@@ -40,6 +41,12 @@ class DeckImportViewModel @Inject constructor(
         )
     }
 
+    fun toggleWithFlipCards() {
+        _uiState.value = _uiState.value.copy(
+            withFlipCards = !_uiState.value.withFlipCards
+        )
+    }
+
     fun pasteImportText(newText: String) {
         _uiState.value = _uiState.value.copy(importText = newText)
     }
@@ -50,7 +57,7 @@ class DeckImportViewModel @Inject constructor(
 
     fun startCreatingDeck() {
         viewModelScope.launch(Dispatchers.IO) {
-            if (createImportDeckUseCase(buildData())) {
+            if (createImportDeckUseCase(buildData(), _uiState.value.withFlipCards)) {
                 backToPreviousScreenUseCase()
             }
         }

@@ -119,7 +119,7 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
                             borderColor = AppButtonBackgroundColor
                         )
 
-                        // Buttons and Checkbox Row
+                        // Buttons and Checkboxes Row
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -156,6 +156,16 @@ fun DeckImportScreenContent (viewModel: DeckImportViewModel){
                                 checked = viewModel.uiState.value.markAsPreLearned,
                                 onCheckedChange = { viewModel.toggleMarkAsPreLearned() },
                                 text = stringResource(R.string.mark_pre_learned),
+
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .width(5.dp)
+                            )
+                            LabeledCheckbox(
+                                checked = viewModel.uiState.value.withFlipCards,
+                                onCheckedChange = { viewModel.toggleWithFlipCards() },
+                                text = stringResource(R.string.with_flip_card_list),
 
                             )
                         }

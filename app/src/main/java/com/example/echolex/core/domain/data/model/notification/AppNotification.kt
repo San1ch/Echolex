@@ -143,29 +143,29 @@ sealed interface AppNotification {
             override val message = "Lesson successfully finished."
         }
 
-        object LessonLessonRestart : Lesson {
+        object LessonRestart : Lesson {
             override val title = ""
             override val message = "Full lesson restarted."
         }
 
-        object LessonStageRestarted : Lesson {
+        object StageRestarted : Lesson {
             override val title = ""
-            override val message = "Lesson restarted"
+            override val message = "Stage restarted"
         }
 
-        object LessonNextStage : Lesson {
+        object NextStage : Lesson {
             override val title = ""
             override val message = "Next stage"
         }
 
-        object LessonNextCycle : Lesson {
+        object NextCycle : Lesson {
             override val title = ""
             override val message = "Next cycle"
         }
 
-        object LessonNextCard : Lesson {
+        object CardsAreNotExist : Lesson {
             override val title = ""
-            override val message = "Next card"
+            override val message = ""
         }
 
     }

@@ -15,7 +15,7 @@ class GetCardExportStringUseCase @Inject constructor(
     private fun zipCardsToString(cards: List<Card>): String{
         var exportString = ""
         cards.map {
-            exportString += it.firstWord + ", " + it.secondWord + ";" + "\n"
+            exportString += it.firstWord + ", " + it.secondWord + "\n"
         }
         return exportString
     }
